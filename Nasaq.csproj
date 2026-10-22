@@ -1,0 +1,47 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <RootNamespace>Nasaq</RootNamespace>
+    <AssemblyName>Nasaq</AssemblyName>
+    <ApplicationIcon>Assets\nasaq.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <Version>1.0.0</Version>
+    <FileVersion>1.0.0.0</FileVersion>
+    <Company>Abdullah Abdulmanea</Company>
+    <Product>Nasaq</Product>
+    <Description>Nasaq — a fast, background file converter for Windows.</Description>
+    <Copyright>© 2026 Abdullah Abdulmanea</Copyright>
+    <NeutralLanguage>en</NeutralLanguage>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <DebugType>embedded</DebugType>
+    <!-- WFAC010 only nags because the WinForms analyzer sees our WPF DPI manifest.
+         The manifest is correct for WPF; WinForms is used solely for NotifyIcon. -->
+    <NoWarn>$(NoWarn);WFAC010</NoWarn>
+  </PropertyGroup>
+
+  <!-- WPF owns the UI; WinForms is only here for the tray icon. Keep its implicit
+       namespaces out so System.Drawing / System.Windows.Forms never collide with WPF types. -->
+  <ItemGroup>
+    <Using Remove="System.Drawing" />
+    <Using Remove="System.Windows.Forms" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\nasaq.ico" />
+    <Resource Include="Assets\logo-256.png" />
+    <Resource Include="Assets\logo-64.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Docnet.Core" Version="2.6.0" />
+  </ItemGroup>
+
+</Project>

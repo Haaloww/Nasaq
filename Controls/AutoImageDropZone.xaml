@@ -1,0 +1,141 @@
+<UserControl x:Class="Nasaq.Controls.AutoImageDropZone"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             x:Name="Root"
+             d:DesignHeight="116" d:DesignWidth="760"
+             AllowDrop="True"
+             Cursor="Hand"
+             Focusable="True"
+             UseLayoutRounding="True"
+             SnapsToDevicePixels="True"
+             DragEnter="Zone_DragEnter"
+             DragOver="Zone_DragOver"
+             DragLeave="Zone_DragLeave"
+             Drop="Zone_Drop"
+             MouseLeftButtonUp="Zone_MouseLeftButtonUp"
+             Loaded="Zone_Loaded"
+             Unloaded="Zone_Unloaded">
+
+    <Border x:Name="Frame" CornerRadius="14" BorderThickness="0" ClipToBounds="True">
+        <Border.Style>
+            <Style TargetType="Border">
+                <Setter Property="Background" Value="{DynamicResource Brush.Surface}" />
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding IsDragOver, ElementName=Root}" Value="True">
+                        <Setter Property="Background" Value="{DynamicResource Brush.AccentSoft}" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding HasImage, ElementName=Root}" Value="True">
+                        <Setter Property="Background" Value="#080A0F" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </Border.Style>
+
+        <Grid x:Name="Surface" ClipToBounds="True">
+            <Rectangle x:Name="DashOutline" RadiusX="13.5" RadiusY="13.5" Margin="0.6"
+                       StrokeThickness="1.2" StrokeDashArray="5 4" IsHitTestVisible="False">
+                <Rectangle.Style>
+                    <Style TargetType="Rectangle">
+                        <Setter Property="Stroke" Value="{DynamicResource Brush.BorderStrong}" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsDragOver, ElementName=Root}" Value="True">
+                                <Setter Property="Stroke" Value="{DynamicResource Brush.Accent}" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Rectangle.Style>
+            </Rectangle>
+
+            <!-- Idle state -->
+            <Grid x:Name="IdlePanel" Margin="17,0">
+                <Grid Margin="14,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <Border Width="46" Height="46" CornerRadius="13"
+                            Background="{DynamicResource Brush.AccentSoft}" VerticalAlignment="Center">
+                        <TextBlock Style="{StaticResource IconGlyph}" Text="&#xEB9F;"
+                                   FontSize="21" Foreground="{DynamicResource Brush.Accent}" />
+                    </Border>
+
+                    <StackPanel Grid.Column="1" Margin="15,0,10,0" VerticalAlignment="Center">
+                        <TextBlock x:Name="Headline" FontSize="15" FontWeight="SemiBold">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Foreground" Value="{DynamicResource Brush.Text}" />
+                                    <Setter Property="FontFamily" Value="{DynamicResource Font.UI}" />
+                                    <Setter Property="Text" Value="Drop an image here" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsDragOver, ElementName=Root}" Value="True">
+                                            <Setter Property="Text" Value="Release to preview" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                        <TextBlock Text="The preview grows to fit its natural size without upscaling."
+                                   Style="{StaticResource Caption}" Margin="0,4,0,0" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right">
+                        <TextBlock Text="PNG · JPG · WEBP · GIF · more" Style="{StaticResource Caption}"
+                                   HorizontalAlignment="Right" Margin="0,0,0,5" />
+                        <TextBlock Text="Browse…" FontSize="12" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource Brush.Accent}" HorizontalAlignment="Right" />
+                    </StackPanel>
+                </Grid>
+            </Grid>
+
+            <!-- Auto-fitted preview state -->
+            <Grid x:Name="PreviewPanel" Visibility="Collapsed" Background="#080A0F">
+                <Image x:Name="PreviewImage" Stretch="Uniform" StretchDirection="DownOnly"
+                       RenderOptions.BitmapScalingMode="HighQuality"
+                       SizeChanged="PreviewImage_SizeChanged" />
+
+                <Border HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10"
+                        Background="#B2080B12" CornerRadius="6" Padding="7,3"
+                        IsHitTestVisible="False">
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse Width="5" Height="5" Fill="{DynamicResource Brush.Accent}"
+                                 VerticalAlignment="Center" Margin="0,0,5,0" />
+                        <TextBlock Text="AUTO-FIT PREVIEW" FontFamily="{DynamicResource Font.Mono}"
+                                   FontSize="8.5" FontWeight="SemiBold" Foreground="#D8FFFFFF" />
+                    </StackPanel>
+                </Border>
+
+                <Border VerticalAlignment="Bottom" Background="#D9080A0F" Padding="12,8">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock x:Name="FileNameText" FontSize="11.5" FontWeight="SemiBold"
+                                       Foreground="#F2F5FA" TextTrimming="CharacterEllipsis" />
+                            <TextBlock x:Name="ImageMetaText" FontSize="9.5" Foreground="#9AA5B5"
+                                       FontFamily="{DynamicResource Font.Mono}" Margin="0,2,0,0"
+                                       TextTrimming="CharacterEllipsis" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center"
+                                    Margin="10,0,0,0">
+                            <Button Style="{StaticResource LinkButton}" Content="Replace" FontSize="10"
+                                    Padding="3,1" Click="Replace_Click"
+                                    Foreground="{DynamicResource Brush.Accent}" />
+                            <Button Style="{StaticResource IconButton}" Width="26" Height="26"
+                                    Margin="7,0,0,0" ToolTip="Clear the preview" Click="Clear_Click">
+                                <TextBlock Style="{StaticResource IconGlyph}" Text="&#xE711;" FontSize="10"
+                                           Foreground="#D8FFFFFF" />
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Grid>
+    </Border>
+</UserControl>

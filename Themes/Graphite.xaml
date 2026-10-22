@@ -1,0 +1,58 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=System.Runtime">
+
+    <!-- Graphite theme · generated palette -->
+    <sys:String x:Key="Theme.Marker">graphite</sys:String>
+
+    <Color x:Key="Color.WindowBg">#0C0C0C</Color>
+    <Color x:Key="Color.TitleBarBg">#141414</Color>
+    <Color x:Key="Color.ContentBg">#111111</Color>
+    <Color x:Key="Color.Surface">#191919</Color>
+    <Color x:Key="Color.SurfaceAlt">#202020</Color>
+    <Color x:Key="Color.SurfaceHover">#272727</Color>
+    <Color x:Key="Color.SurfacePressed">#2E2E2E</Color>
+    <Color x:Key="Color.Border">#2B2B2B</Color>
+    <Color x:Key="Color.BorderStrong">#3B3B3B</Color>
+    <Color x:Key="Color.Text">#F4F1EA</Color>
+    <Color x:Key="Color.TextMuted">#A7A49C</Color>
+    <Color x:Key="Color.TextFaint">#77746C</Color>
+    <Color x:Key="Color.Accent">#E4B363</Color>
+    <Color x:Key="Color.AccentHover">#F0C67A</Color>
+    <Color x:Key="Color.AccentText">#161006</Color>
+    <Color x:Key="Color.AccentSoft">#332716</Color>
+    <Color x:Key="Color.Danger">#FF7A6B</Color>
+    <Color x:Key="Color.DangerSoft">#3A1C18</Color>
+    <Color x:Key="Color.Success">#8ED081</Color>
+    <Color x:Key="Color.SuccessSoft">#1C2E18</Color>
+    <Color x:Key="Color.Warning">#E4B363</Color>
+    <Color x:Key="Color.WarningSoft">#332716</Color>
+    <Color x:Key="Color.Track">#222222</Color>
+    <Color x:Key="Color.WindowEdge">#262626</Color>
+    <Color x:Key="Color.Overlay">#D90C0C0C</Color>
+    <SolidColorBrush x:Key="Brush.WindowBg" Color="{StaticResource Color.WindowBg}" />
+    <SolidColorBrush x:Key="Brush.TitleBarBg" Color="{StaticResource Color.TitleBarBg}" />
+    <SolidColorBrush x:Key="Brush.ContentBg" Color="{StaticResource Color.ContentBg}" />
+    <SolidColorBrush x:Key="Brush.Surface" Color="{StaticResource Color.Surface}" />
+    <SolidColorBrush x:Key="Brush.SurfaceAlt" Color="{StaticResource Color.SurfaceAlt}" />
+    <SolidColorBrush x:Key="Brush.SurfaceHover" Color="{StaticResource Color.SurfaceHover}" />
+    <SolidColorBrush x:Key="Brush.SurfacePressed" Color="{StaticResource Color.SurfacePressed}" />
+    <SolidColorBrush x:Key="Brush.Border" Color="{StaticResource Color.Border}" />
+    <SolidColorBrush x:Key="Brush.BorderStrong" Color="{StaticResource Color.BorderStrong}" />
+    <SolidColorBrush x:Key="Brush.Text" Color="{StaticResource Color.Text}" />
+    <SolidColorBrush x:Key="Brush.TextMuted" Color="{StaticResource Color.TextMuted}" />
+    <SolidColorBrush x:Key="Brush.TextFaint" Color="{StaticResource Color.TextFaint}" />
+    <SolidColorBrush x:Key="Brush.Accent" Color="{StaticResource Color.Accent}" />
+    <SolidColorBrush x:Key="Brush.AccentHover" Color="{StaticResource Color.AccentHover}" />
+    <SolidColorBrush x:Key="Brush.AccentText" Color="{StaticResource Color.AccentText}" />
+    <SolidColorBrush x:Key="Brush.AccentSoft" Color="{StaticResource Color.AccentSoft}" />
+    <SolidColorBrush x:Key="Brush.Danger" Color="{StaticResource Color.Danger}" />
+    <SolidColorBrush x:Key="Brush.DangerSoft" Color="{StaticResource Color.DangerSoft}" />
+    <SolidColorBrush x:Key="Brush.Success" Color="{StaticResource Color.Success}" />
+    <SolidColorBrush x:Key="Brush.SuccessSoft" Color="{StaticResource Color.SuccessSoft}" />
+    <SolidColorBrush x:Key="Brush.Warning" Color="{StaticResource Color.Warning}" />
+    <SolidColorBrush x:Key="Brush.WarningSoft" Color="{StaticResource Color.WarningSoft}" />
+    <SolidColorBrush x:Key="Brush.Track" Color="{StaticResource Color.Track}" />
+    <SolidColorBrush x:Key="Brush.WindowEdge" Color="{StaticResource Color.WindowEdge}" />
+    <SolidColorBrush x:Key="Brush.Overlay" Color="{StaticResource Color.Overlay}" />
+</ResourceDictionary>

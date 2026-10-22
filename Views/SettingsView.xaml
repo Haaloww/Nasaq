@@ -1,0 +1,925 @@
+<UserControl x:Class="Nasaq.Views.SettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignHeight="630" d:DesignWidth="1080"
+             Background="Transparent">
+
+    <Grid Margin="22,14,22,16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="12" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Grid Grid.Row="0">
+            <StackPanel>
+                <TextBlock Text="Settings" Style="{StaticResource PageTitle}" />
+                <TextBlock Text="Tune how Nasaq converts, where files land, and how it looks."
+                           Style="{StaticResource Caption}" Margin="0,3,0,0" />
+            </StackPanel>
+            <Button Style="{StaticResource PrimaryButton}" HorizontalAlignment="Right" VerticalAlignment="Center"
+                    Click="Done_Click" Padding="16,9">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Style="{StaticResource IconGlyph}" Text="&#xE73E;" FontSize="12" Margin="0,0,7,0" />
+                    <TextBlock Text="Done" FontSize="12.5" />
+                </StackPanel>
+            </Button>
+        </Grid>
+
+        <TabControl x:Name="Tabs" Grid.Row="2" Style="{StaticResource SettingsTabs}"
+                    SelectionChanged="Tabs_SelectionChanged">
+
+            <!-- ═══════════════ GENERAL ═══════════════ -->
+            <TabItem Header="General" Tag="&#xE713;">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="0,0,12,8">
+                    <StackPanel>
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBlock Text="OUTPUT FOLDER" Style="{StaticResource SectionLabel}" />
+                                <TextBlock Text="Converted files are written here. Nasaq creates the folder if it doesn't exist."
+                                           Style="{StaticResource Caption}" Margin="0,4,0,0" />
+                                <Grid Margin="0,10,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox Text="{Binding Settings.OutputDirectory, Mode=TwoWay}"
+                                             VerticalContentAlignment="Center" />
+                                    <Button Grid.Column="1" Style="{StaticResource SecondaryButton}"
+                                            Content="Browse…" Padding="13,8" Margin="8,0,0,0"
+                                            Command="{Binding BrowseOutputCommand}" />
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource Card}" Margin="0,10,0,0">
+                            <StackPanel>
+                                <Grid>
+                                    <TextBlock Text="BACKGROUND TASKS" Style="{StaticResource SectionLabel}" />
+                                    <TextBlock Text="{Binding Settings.MaxConcurrentTasks, StringFormat={}{0} at a time}"
+                                               FontSize="11" FontWeight="SemiBold" HorizontalAlignment="Right"
+                                               Foreground="{DynamicResource Brush.Accent}" />
+                                </Grid>
+                                <Slider Style="{StaticResource SlimSlider}" Minimum="1" Maximum="8"
+                                        IsSnapToTickEnabled="True" TickFrequency="1" Margin="0,7,0,0"
+                                        Value="{Binding Settings.MaxConcurrentTasks, Mode=TwoWay}" />
+                                <TextBlock Text="How many files convert simultaneously. Raise it on a fast machine; lower it to keep the PC quiet."
+                                           Style="{StaticResource Caption}" Margin="0,4,0,0" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource Card}" Margin="0,10,0,0">
+                            <StackPanel>
+                                <TextBlock Text="BEHAVIOUR" Style="{StaticResource SectionLabel}" />
+
+                                <Grid Margin="0,15,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel>
+                                        <TextBlock Text="Start automatically after adding files" FontSize="12.5" />
+                                        <TextBlock Text="New drops begin converting immediately, no extra click."
+                                                   Style="{StaticResource Caption}" Margin="0,3,0,0" />
+                                    </StackPanel>
+                                    <ToggleButton Grid.Column="1" Style="{StaticResource ToggleSwitch}"
+                                                  VerticalAlignment="Center"
+                                                  IsChecked="{Binding Settings.AutoStartAfterAdd, Mode=TwoWay}" />
+                                </Grid>
+
+                                <Border Height="1" Background="{DynamicResource Brush.Border}" Margin="0,15,0,0" />
+
+                                <Grid Margin="0,15,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel>
+                                        <TextBlock Text="Overwrite existing files" FontSize="12.5" />
+                                        <TextBlock Text="When off, Nasaq writes a numbered copy instead of replacing anything."
+                                                   Style="{StaticResource Caption}" Margin="0,3,0,0" />
+                                    </StackPanel>
+                                    <ToggleButton Grid.Column="1" Style="{StaticResource ToggleSwitch}"
+                                                  VerticalAlignment="Center"
+                                                  IsChecked="{Binding Settings.OverwriteExisting, Mode=TwoWay}" />
+                                </Grid>
+
+                                <Border Height="1" Background="{DynamicResource Brush.Border}" Margin="0,15,0,0" />
+
+                                <Grid Margin="0,15,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel>
+                                        <TextBlock Text="Preserve metadata" FontSize="12.5" />
+                                        <TextBlock Text="Carries over tags where the target format allows it."
+                                                   Style="{StaticResource Caption}" Margin="0,3,0,0" />
+                                    </StackPanel>
+                                    <ToggleButton Grid.Column="1" Style="{StaticResource ToggleSwitch}"
+                                                  VerticalAlignment="Center"
+                                                  IsChecked="{Binding Settings.PreserveMetadata, Mode=TwoWay}" />
+                                </Grid>
+
+                                <Border Height="1" Background="{DynamicResource Brush.Border}" Margin="0,15,0,0" />
+
+                                <Grid Margin="0,15,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel>
+                                        <TextBlock Text="Launch at Windows sign-in" FontSize="12.5" />
+                                        <TextBlock Text="Starts Nasaq quietly when you sign in to Windows."
+                                                   Style="{StaticResource Caption}" Margin="0,3,0,0" />
+                                    </StackPanel>
+                                    <ToggleButton Grid.Column="1" Style="{StaticResource ToggleSwitch}"
+                                                  VerticalAlignment="Center"
+                                                  IsChecked="{Binding Settings.LaunchAtStartup, Mode=TwoWay}" />
+                                </Grid>
+
+                                <Border Height="1" Background="{DynamicResource Brush.Border}" Margin="0,15,0,0" />
+
+                                <Grid Margin="0,15,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel>
+                                        <TextBlock Text="Keep running in the background" FontSize="12.5" />
+                                        <TextBlock Text="Closing the window leaves Nasaq in the tray, so conversions, the hotkey and the drop shelf keep working."
+                                                   Style="{StaticResource Caption}" Margin="0,3,0,0" TextWrapping="Wrap" />
+                                    </StackPanel>
+                                    <ToggleButton Grid.Column="1" Style="{StaticResource ToggleSwitch}"
+                                                  VerticalAlignment="Center"
+                                                  IsChecked="{Binding Settings.KeepRunningInBackground, Mode=TwoWay}" />
+                                </Grid>
+
+                                <Border Height="1" Background="{DynamicResource Brush.Border}" Margin="0,15,0,0" />
+
+                                <Grid Margin="0,15,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel>
+                                        <TextBlock Text="Start hidden in the tray" FontSize="12.5" />
+                                        <TextBlock Text="Nasaq opens silently at sign-in and waits for a drag or hotkey. Applies next launch."
+                                                   Style="{StaticResource Caption}" Margin="0,3,0,0" TextWrapping="Wrap" />
+                                    </StackPanel>
+                                    <ToggleButton Grid.Column="1" Style="{StaticResource ToggleSwitch}"
+                                                  VerticalAlignment="Center"
+                                                  IsChecked="{Binding Settings.StartMinimized, Mode=TwoWay}" />
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource Card}" Margin="0,10,0,0">
+                            <StackPanel>
+                                <TextBlock Text="DROP SHELF" Style="{StaticResource SectionLabel}" />
+                                <TextBlock Text="Choose one or more ways to open the floating drop target."
+                                           Style="{StaticResource Caption}" Margin="0,4,0,0" />
+
+                                <Grid Margin="0,15,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel>
+                                        <TextBlock Text="Global hotkey" FontSize="12.5" />
+                                        <TextBlock Text="Press the chosen shortcut anywhere in Windows to summon the shelf."
+                                                   Style="{StaticResource Caption}" Margin="0,3,0,0" TextWrapping="Wrap" />
+                                    </StackPanel>
+                                    <ToggleButton Grid.Column="1" Style="{StaticResource ToggleSwitch}"
+                                                  VerticalAlignment="Center"
+                                                  IsChecked="{Binding Settings.EnableShelfHotkey, Mode=TwoWay}" />
+                                </Grid>
+
+                                <Grid Margin="0,10,0,0" IsEnabled="{Binding Settings.EnableShelfHotkey}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Shortcut" Style="{StaticResource Caption}"
+                                               VerticalAlignment="Center" />
+                                    <ComboBox Grid.Column="1" Width="192" Height="32" FontSize="11.5"
+                                              ItemsSource="{Binding HotkeyChoices}" DisplayMemberPath="Label"
+                                              SelectedValuePath="Id"
+                                              SelectedValue="{Binding Settings.ShelfHotkeyId, Mode=TwoWay}" />
+                                </Grid>
+
+                                <Border Height="1" Background="{DynamicResource Brush.Border}" Margin="0,15,0,0" />
+
+                                <Grid Margin="0,15,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel>
+                                        <TextBlock Text="Summon while dragging with Ctrl" FontSize="12.5" />
+                                        <TextBlock Text="Hold Ctrl while dragging files from Explorer or the desktop and the shelf appears at the cursor."
+                                                   Style="{StaticResource Caption}" Margin="0,3,0,0" TextWrapping="Wrap" />
+                                    </StackPanel>
+                                    <ToggleButton Grid.Column="1" Style="{StaticResource ToggleSwitch}"
+                                                  VerticalAlignment="Center"
+                                                  IsChecked="{Binding Settings.ShowShelfOnCtrlDrag, Mode=TwoWay}" />
+                                </Grid>
+
+                                <Border Height="1" Background="{DynamicResource Brush.Border}" Margin="0,15,0,0" />
+
+                                <Grid Margin="0,15,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel>
+                                        <TextBlock Text="Middle-click the tray icon" FontSize="12.5" />
+                                        <TextBlock Text="Open the shelf straight from the notification area without bringing the main window forward."
+                                                   Style="{StaticResource Caption}" Margin="0,3,0,0" TextWrapping="Wrap" />
+                                    </StackPanel>
+                                    <ToggleButton Grid.Column="1" Style="{StaticResource ToggleSwitch}"
+                                                  VerticalAlignment="Center"
+                                                  IsChecked="{Binding Settings.ShelfOnTrayMiddleClick, Mode=TwoWay}" />
+                                </Grid>
+
+                                <Border Background="{DynamicResource Brush.SurfaceAlt}" CornerRadius="8"
+                                        Padding="10,7" HorizontalAlignment="Left" Margin="0,12,0,0">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="Active" Style="{StaticResource Caption}" VerticalAlignment="Center" />
+                                        <Border Background="{DynamicResource Brush.Surface}" CornerRadius="5"
+                                                Padding="7,2" Margin="8,0,0,0">
+                                            <TextBlock Text="{Binding HotkeyHint}" FontFamily="{DynamicResource Font.Mono}"
+                                                       FontSize="10.5" Foreground="{DynamicResource Brush.Accent}" />
+                                        </Border>
+                                        <Border Width="1" Height="12" Background="{DynamicResource Brush.Border}"
+                                                Margin="9,0" VerticalAlignment="Center" />
+                                        <TextBlock Text="Footer button &amp; tray menu" Style="{StaticResource Caption}"
+                                                   VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- ═══════════════ APPEARANCE ═══════════════ -->
+            <TabItem Header="Appearance" Tag="&#xE790;">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="0,0,12,8">
+                    <StackPanel>
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBlock Text="THEME" Style="{StaticResource SectionLabel}" />
+                                <TextBlock Text="Themes switch instantly — no restart, no reload."
+                                           Style="{StaticResource Caption}" Margin="0,4,0,10" />
+
+                                <ListBox ItemsSource="{Binding Themes}" SelectedValuePath="Id"
+                                         SelectedValue="{Binding Settings.ThemeId, Mode=TwoWay}"
+                                         Background="Transparent" BorderThickness="0"
+                                         ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                    <ListBox.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <WrapPanel />
+                                        </ItemsPanelTemplate>
+                                    </ListBox.ItemsPanel>
+                                    <ListBox.ItemContainerStyle>
+                                        <Style TargetType="ListBoxItem">
+                                            <Setter Property="Cursor" Value="Hand" />
+                                            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+                                            <Setter Property="Margin" Value="0,0,10,10" />
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="ListBoxItem">
+                                                        <Border x:Name="Bd" Width="188" CornerRadius="11"
+                                                                Background="{DynamicResource Brush.SurfaceAlt}"
+                                                                BorderBrush="{DynamicResource Brush.Border}"
+                                                                BorderThickness="1" Padding="10">
+                                                            <ContentPresenter />
+                                                        </Border>
+                                                        <ControlTemplate.Triggers>
+                                                            <Trigger Property="IsMouseOver" Value="True">
+                                                                <Setter TargetName="Bd" Property="BorderBrush"
+                                                                        Value="{DynamicResource Brush.BorderStrong}" />
+                                                            </Trigger>
+                                                            <Trigger Property="IsSelected" Value="True">
+                                                                <Setter TargetName="Bd" Property="BorderBrush"
+                                                                        Value="{DynamicResource Brush.Accent}" />
+                                                                <Setter TargetName="Bd" Property="Background"
+                                                                        Value="{DynamicResource Brush.AccentSoft}" />
+                                                            </Trigger>
+                                                        </ControlTemplate.Triggers>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </ListBox.ItemContainerStyle>
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <StackPanel>
+                                                <Grid Height="48">
+                                                    <Border CornerRadius="7"
+                                                            Background="{Binding Backdrop, Converter={StaticResource HexToBrush}}" />
+                                                    <Border Width="52" Height="26" CornerRadius="6"
+                                                            Background="{Binding Accent, Converter={StaticResource HexToBrush}}"
+                                                            HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,0" />
+                                                    <TextBlock Text="Aa" FontSize="11" FontWeight="Bold" Foreground="White"
+                                                               HorizontalAlignment="Left" VerticalAlignment="Center"
+                                                               Margin="22,0,0,0" />
+                                                </Grid>
+                                                <TextBlock Text="{Binding Name}" FontSize="12" FontWeight="SemiBold"
+                                                           Margin="0,8,0,0" />
+                                                <TextBlock Text="{Binding Description}" Style="{StaticResource Caption}"
+                                                           FontSize="10.5" Margin="0,2,0,0" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource Card}" Margin="0,0,0,0">
+                            <StackPanel>
+                                <TextBlock Text="PREVIEW" Style="{StaticResource SectionLabel}" />
+                                <Border Background="{DynamicResource Brush.ContentBg}" CornerRadius="10"
+                                        BorderBrush="{DynamicResource Brush.Border}" BorderThickness="1"
+                                        Height="132" Margin="0,10,0,0" ClipToBounds="True">
+                                    <Grid>
+                                        <Border Height="30" Background="{DynamicResource Brush.TitleBarBg}"
+                                                VerticalAlignment="Top" BorderBrush="{DynamicResource Brush.Border}"
+                                                BorderThickness="0,0,0,1">
+                                            <StackPanel Orientation="Horizontal" Margin="10,0">
+                                                <Ellipse Width="7" Height="7" Fill="{DynamicResource Brush.Accent}"
+                                                         VerticalAlignment="Center" />
+                                                <TextBlock Text="Nasaq" FontSize="10" FontWeight="SemiBold"
+                                                           Margin="6,0,0,0" VerticalAlignment="Center" />
+                                                <TextBlock Text="Queue" Style="{StaticResource Caption}" FontSize="9"
+                                                           Margin="14,0,0,0" VerticalAlignment="Center" />
+                                            </StackPanel>
+                                        </Border>
+                                        <Border Background="{DynamicResource Brush.Surface}"
+                                                BorderBrush="{DynamicResource Brush.Border}" BorderThickness="1"
+                                                CornerRadius="9" Width="300" Height="66" Margin="12,0,0,12"
+                                                HorizontalAlignment="Left" VerticalAlignment="Bottom" Padding="10">
+                                            <StackPanel>
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <Border Width="24" Height="24" CornerRadius="6"
+                                                            Background="{DynamicResource Brush.AccentSoft}">
+                                                        <TextBlock Style="{StaticResource IconGlyph}" Text="&#xEB9F;"
+                                                                   FontSize="11" Foreground="{DynamicResource Brush.Accent}" />
+                                                    </Border>
+                                                    <TextBlock Grid.Column="1" Text="photo.png" FontSize="10.5" FontWeight="SemiBold"
+                                                               VerticalAlignment="Center" Margin="7,0,6,0"
+                                                               TextTrimming="CharacterEllipsis" />
+                                                    <Border Grid.Column="2" Background="{DynamicResource Brush.AccentSoft}"
+                                                            CornerRadius="4" Padding="5,1" VerticalAlignment="Center">
+                                                        <TextBlock Text="WEBP" FontSize="8" FontWeight="SemiBold"
+                                                                   Foreground="{DynamicResource Brush.Accent}" />
+                                                    </Border>
+                                                </Grid>
+                                                <ProgressBar Value="72" Style="{StaticResource SlimProgress}"
+                                                             Foreground="{DynamicResource Brush.Accent}" Margin="0,9,0,0" />
+                                                <TextBlock Text="Converting · 72%" Style="{StaticResource Caption}"
+                                                           FontSize="9" Margin="0,5,0,0" />
+                                            </StackPanel>
+                                        </Border>
+                                    </Grid>
+                                </Border>
+                                <TextBlock Text="Accent colours, surfaces and borders update live across every window."
+                                           Style="{StaticResource Caption}" Margin="0,8,0,0" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource Card}" Margin="0,10,0,0">
+                            <StackPanel>
+                                <TextBlock Text="MOTION" Style="{StaticResource SectionLabel}" />
+
+                                <Grid Margin="0,15,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel>
+                                        <TextBlock Text="Interface animations" FontSize="12.5" />
+                                        <TextBlock Text="Transitions, pulsing progress bars, toasts and the auto-resizing image preview. Turn off for an instant, still interface."
+                                                   Style="{StaticResource Caption}" Margin="0,3,0,0" TextWrapping="Wrap" />
+                                    </StackPanel>
+                                    <ToggleButton Grid.Column="1" Style="{StaticResource ToggleSwitch}"
+                                                  VerticalAlignment="Center"
+                                                  IsChecked="{Binding Settings.AnimationsEnabled, Mode=TwoWay}" />
+                                </Grid>
+
+                                <Border Height="1" Background="{DynamicResource Brush.Border}" Margin="0,15,0,0" />
+
+                                <Grid Margin="0,15,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel>
+                                        <TextBlock Text="Animated background" FontSize="12.5" />
+                                        <TextBlock Text="Slow accent glows drift behind the interface. Turn off for a completely still window."
+                                                   Style="{StaticResource Caption}" Margin="0,3,0,0" TextWrapping="Wrap" />
+                                    </StackPanel>
+                                    <ToggleButton Grid.Column="1" Style="{StaticResource ToggleSwitch}"
+                                                  VerticalAlignment="Center"
+                                                  IsChecked="{Binding Settings.AnimatedBackground, Mode=TwoWay}" />
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- ═══════════════ CONVERSION ═══════════════ -->
+            <TabItem Header="Conversion" Tag="&#xE895;">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="0,0,12,8">
+                    <StackPanel>
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBlock Text="DEFAULT FORMATS" Style="{StaticResource SectionLabel}" />
+                                <TextBlock Text="Used automatically for every new file. Change these per batch from the main screen too."
+                                           Style="{StaticResource Caption}" Margin="0,4,0,8" />
+
+                                <Grid Margin="0,4,0,0">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="28" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="128" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Style="{StaticResource IconGlyph}" Text="&#xEB9F;"
+                                               FontSize="13" Foreground="{DynamicResource Brush.TextMuted}" Margin="0,0,0,8" />
+                                    <TextBlock Grid.Row="0" Grid.Column="1" Text="Images" FontSize="12.5"
+                                               VerticalAlignment="Center" Margin="0,0,0,8" />
+                                    <ComboBox Grid.Row="0" Grid.Column="2" Height="32" FontSize="11.5" Margin="0,0,0,8"
+                                              ItemsSource="{Binding ImageFormats}" DisplayMemberPath="Label"
+                                              SelectedValuePath="Id"
+                                              SelectedValue="{Binding Settings.LastImageFormat, Mode=TwoWay}" />
+
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Style="{StaticResource IconGlyph}" Text="&#xE8D6;"
+                                               FontSize="13" Foreground="{DynamicResource Brush.TextMuted}" Margin="0,0,0,8" />
+                                    <TextBlock Grid.Row="1" Grid.Column="1" Text="Audio" FontSize="12.5"
+                                               VerticalAlignment="Center" Margin="0,0,0,8" />
+                                    <ComboBox Grid.Row="1" Grid.Column="2" Height="32" FontSize="11.5" Margin="0,0,0,8"
+                                              ItemsSource="{Binding AudioFormats}" DisplayMemberPath="Label"
+                                              SelectedValuePath="Id"
+                                              SelectedValue="{Binding Settings.LastAudioFormat, Mode=TwoWay}" />
+
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Style="{StaticResource IconGlyph}" Text="&#xE714;"
+                                               FontSize="13" Foreground="{DynamicResource Brush.TextMuted}" Margin="0,0,0,8" />
+                                    <TextBlock Grid.Row="2" Grid.Column="1" Text="Video" FontSize="12.5"
+                                               VerticalAlignment="Center" Margin="0,0,0,8" />
+                                    <ComboBox Grid.Row="2" Grid.Column="2" Height="32" FontSize="11.5" Margin="0,0,0,8"
+                                              ItemsSource="{Binding VideoFormats}" DisplayMemberPath="Label"
+                                              SelectedValuePath="Id"
+                                              SelectedValue="{Binding Settings.LastVideoFormat, Mode=TwoWay}" />
+
+                                    <TextBlock Grid.Row="3" Grid.Column="0" Style="{StaticResource IconGlyph}" Text="&#xE8A5;"
+                                               FontSize="13" Foreground="{DynamicResource Brush.TextMuted}" />
+                                    <TextBlock Grid.Row="3" Grid.Column="1" Text="Documents" FontSize="12.5"
+                                               VerticalAlignment="Center" />
+                                    <ComboBox Grid.Row="3" Grid.Column="2" Height="32" FontSize="11.5"
+                                              ItemsSource="{Binding DocumentFormats}" DisplayMemberPath="Label"
+                                              SelectedValuePath="Id"
+                                              SelectedValue="{Binding Settings.LastDocumentFormat, Mode=TwoWay}" />
+                                </Grid>
+
+                                <Border Height="1" Background="{DynamicResource Brush.Border}" Margin="0,14,0,0" />
+
+                                <Grid Margin="0,14,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel>
+                                        <TextBlock Text="Extract audio from videos" FontSize="12.5" />
+                                        <TextBlock Text="Videos become the Audio target above (MP3, WAV, etc.) instead of video files."
+                                                   Style="{StaticResource Caption}" Margin="0,3,0,0" TextWrapping="Wrap" />
+                                    </StackPanel>
+                                    <ToggleButton Grid.Column="1" Style="{StaticResource ToggleSwitch}"
+                                                  VerticalAlignment="Center"
+                                                  IsChecked="{Binding Settings.ExtractAudioFromVideo, Mode=TwoWay}" />
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource Card}" Margin="0,10,0,0">
+                            <StackPanel>
+                                <TextBlock Text="ENCODING" Style="{StaticResource SectionLabel}" />
+
+                                <Grid Margin="0,15,0,0">
+                                    <TextBlock Text="Image quality" FontSize="12.5" />
+                                    <TextBlock Text="{Binding Settings.ImageQuality, StringFormat={}{0}%}"
+                                               FontSize="11" FontWeight="SemiBold" HorizontalAlignment="Right"
+                                               Foreground="{DynamicResource Brush.Accent}" />
+                                </Grid>
+                                <Slider Style="{StaticResource SlimSlider}" Minimum="40" Maximum="100"
+                                        IsSnapToTickEnabled="True" TickFrequency="1" Margin="0,2,0,0"
+                                        Value="{Binding Settings.ImageQuality, Mode=TwoWay}" />
+                                <TextBlock Text="JPEG and WebP quality. Higher keeps more detail and creates larger files."
+                                           Style="{StaticResource Caption}" Margin="0,1,0,0" />
+
+                                <Grid Margin="0,16,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel>
+                                        <TextBlock Text="Audio bitrate" FontSize="12.5" />
+                                        <TextBlock Text="Applies to MP3, M4A and Opus output."
+                                                   Style="{StaticResource Caption}" Margin="0,3,0,0" />
+                                    </StackPanel>
+                                    <ComboBox Grid.Column="1" Width="112" Height="32" FontSize="11.5"
+                                              ItemsSource="{Binding AudioBitrates}" SelectedItem="{Binding Settings.AudioBitrate, Mode=TwoWay}"
+                                              VerticalAlignment="Center" />
+                                </Grid>
+
+                                <Grid Margin="0,16,0,0">
+                                    <TextBlock Text="Video quality (CRF)" FontSize="12.5" />
+                                    <TextBlock Text="{Binding Settings.VideoQuality}" FontSize="11" FontWeight="SemiBold"
+                                               HorizontalAlignment="Right" Foreground="{DynamicResource Brush.Accent}" />
+                                </Grid>
+                                <Slider Style="{StaticResource SlimSlider}" Minimum="14" Maximum="35"
+                                        IsSnapToTickEnabled="True" TickFrequency="1" Margin="0,2,0,0"
+                                        Value="{Binding Settings.VideoQuality, Mode=TwoWay}" />
+                                <TextBlock Text="Lower CRF means higher quality and bigger video files (18–28 is the sweet spot)."
+                                           Style="{StaticResource Caption}" Margin="0,1,0,0" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource Card}" Margin="0,10,0,0">
+                            <StackPanel>
+                                <TextBlock Text="SUPPORTED SOURCES" Style="{StaticResource SectionLabel}" />
+                                <TextBlock Text="Images · PNG, JPG, WebP, HEIC, GIF, BMP, TIFF, ICO, AVIF"
+                                           Style="{StaticResource Caption}" Margin="0,8,0,0" />
+                                <TextBlock Text="Audio · MP3, WAV, FLAC, AAC, M4A, OGG, OPUS, WMA, AIFF, AMR"
+                                           Style="{StaticResource Caption}" Margin="0,4,0,0" />
+                                <TextBlock Text="Video · MP4, MKV, WebM, MOV, AVI, WMV, FLV, MPG, TS, 3GP"
+                                           Style="{StaticResource Caption}" Margin="0,4,0,0" />
+                                <TextBlock Text="Documents · DOCX, TXT, Markdown, HTML, RTF, CSV, JSON, XML, YAML"
+                                           Style="{StaticResource Caption}" Margin="0,4,0,0" />
+                                <TextBlock Text="PDF and legacy DOC files can't be read yet; they are supported as outputs."
+                                           Style="{StaticResource Caption}" Margin="0,8,0,0"
+                                           Foreground="{DynamicResource Brush.Warning}" />
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- ═══════════════ ADVANCED ═══════════════ -->
+            <TabItem Header="Advanced" Tag="&#xE9D9;">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="0,0,12,8">
+                    <StackPanel>
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <Grid>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Ellipse Width="8" Height="8" VerticalAlignment="Center" Margin="0,0,8,0">
+                                            <Ellipse.Style>
+                                                <Style TargetType="Ellipse">
+                                                    <Setter Property="Fill" Value="{DynamicResource Brush.Danger}" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding EngineAvailable}" Value="True">
+                                                            <Setter Property="Fill" Value="{DynamicResource Brush.Success}" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Ellipse.Style>
+                                        </Ellipse>
+                                        <TextBlock Text="{Binding EngineTitle}" FontSize="13" FontWeight="SemiBold"
+                                                   VerticalAlignment="Center" />
+                                    </StackPanel>
+                                    <Button Style="{StaticResource LinkButton}" Content="Recheck" FontSize="10.5"
+                                            HorizontalAlignment="Right" Command="{Binding RefreshEngineCommand}" />
+                                </Grid>
+                                <TextBlock Text="{Binding EngineDetail}" Style="{StaticResource Caption}" Margin="16,4,0,0" />
+
+                                <TextBlock Text="FFMPEG PATH" Style="{StaticResource SectionLabel}" Margin="0,16,0,0" />
+                                <TextBlock Text="Leave empty to search the app folder, PATH and WinGet automatically."
+                                           Style="{StaticResource Caption}" Margin="0,4,0,0" />
+                                <Grid Margin="0,8,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox Text="{Binding Settings.FfmpegPath, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                             VerticalContentAlignment="Center" />
+                                    <Button Grid.Column="1" Style="{StaticResource SecondaryButton}" Content="Browse…"
+                                            Padding="13,8" Margin="8,0,0,0" Click="BrowseFfmpeg_Click" />
+                                </Grid>
+                                <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                                    <Button Style="{StaticResource GhostButton}" Content="Auto-detect" FontSize="11.5"
+                                            Click="AutoDetectFfmpeg_Click" />
+                                    <Button Style="{StaticResource GhostButton}" Content="Open logs" FontSize="11.5"
+                                            Command="{Binding OpenLogsCommand}" Margin="4,0,0,0" />
+                                    <Button Style="{StaticResource GhostButton}" Content="Copy diagnostics" FontSize="11.5"
+                                            Command="{Binding CopyDiagnosticsCommand}" Margin="4,0,0,0" />
+                                </StackPanel>
+                                <TextBlock Text="FFmpeg powers audio, video and WebP conversion. Images and documents work without it."
+                                           Style="{StaticResource Caption}" Margin="0,8,0,0" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource Card}" Margin="0,10,0,0">
+                            <StackPanel>
+                                <TextBlock Text="LOGGING" Style="{StaticResource SectionLabel}" />
+                                <Grid Margin="0,14,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel>
+                                        <TextBlock Text="Verbose debug logging" FontSize="12.5" />
+                                        <TextBlock Text="Records FFmpeg output, theme switches and queue events."
+                                                   Style="{StaticResource Caption}" Margin="0,3,0,0" />
+                                    </StackPanel>
+                                    <ToggleButton Grid.Column="1" Style="{StaticResource ToggleSwitch}"
+                                                  VerticalAlignment="Center"
+                                                  IsChecked="{Binding Settings.VerboseLogging, Mode=TwoWay}" />
+                                </Grid>
+                                <Border Background="{DynamicResource Brush.SurfaceAlt}" CornerRadius="8" Padding="10,7" Margin="0,12,0,0">
+                                    <TextBlock Text="{Binding LogDirectoryPath}" FontFamily="{DynamicResource Font.Mono}"
+                                               FontSize="10.5" Foreground="{DynamicResource Brush.TextMuted}"
+                                               TextTrimming="CharacterEllipsis" ToolTip="{Binding LogDirectoryPath}" />
+                                </Border>
+                                <TextBlock Text="One log per day, pruned after 30 days. Crash reports live in the crashes subfolder."
+                                           Style="{StaticResource Caption}" Margin="0,7,0,0" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource Card}" Margin="0,10,0,0">
+                            <StackPanel>
+                                <Grid>
+                                    <TextBlock Text="DEBUG LOG" Style="{StaticResource SectionLabel}" VerticalAlignment="Center" />
+                                    <Button Style="{StaticResource GhostButton}" Content="Refresh" FontSize="10.5"
+                                            HorizontalAlignment="Right" Padding="8,4" Click="RefreshLog_Click" />
+                                </Grid>
+                                <Border Style="{StaticResource Inset}" Margin="0,8,0,0" Padding="10">
+                                    <ScrollViewer x:Name="LogScroll" Height="180" VerticalScrollBarVisibility="Auto"
+                                                  HorizontalScrollBarVisibility="Auto">
+                                        <TextBlock x:Name="LogOutput" FontFamily="{DynamicResource Font.Mono}"
+                                                   FontSize="10.5" Foreground="{DynamicResource Brush.TextMuted}"
+                                                   TextWrapping="NoWrap" />
+                                    </ScrollViewer>
+                                </Border>
+                                <TextBlock Text="The tail of today's log. Full crash reports are written with indented stack traces."
+                                           Style="{StaticResource Caption}" Margin="0,7,0,0" />
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- ═══════════════ INSTALLER ═══════════════ -->
+            <TabItem Header="Installer" Tag="&#xE896;">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="0,0,12,8">
+                    <StackPanel>
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <Grid>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Ellipse Width="8" Height="8" VerticalAlignment="Center" Margin="0,0,8,0">
+                                            <Ellipse.Style>
+                                                <Style TargetType="Ellipse">
+                                                    <Setter Property="Fill" Value="{DynamicResource Brush.Warning}" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Installer.EngineReady}" Value="True">
+                                                            <Setter Property="Fill" Value="{DynamicResource Brush.Success}" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Installer.IsEngineBusy}" Value="True">
+                                                            <Setter Property="Fill" Value="{DynamicResource Brush.Accent}" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Ellipse.Style>
+                                        </Ellipse>
+                                        <TextBlock Text="{Binding Installer.EngineTitle}" FontSize="13" FontWeight="SemiBold"
+                                                   VerticalAlignment="Center" />
+                                    </StackPanel>
+                                    <Button Style="{StaticResource LinkButton}" Content="Recheck" FontSize="10.5"
+                                            HorizontalAlignment="Right" Command="{Binding Installer.RefreshEngineCommand}" />
+                                </Grid>
+                                <TextBlock Text="{Binding Installer.EngineDetail}" Style="{StaticResource Caption}" Margin="16,4,0,0" />
+                                <TextBlock Text="{Binding Installer.EngineError}" Style="{StaticResource Caption}" Margin="16,4,0,0"
+                                           Foreground="{DynamicResource Brush.Warning}"
+                                           Visibility="{Binding Installer.EngineError, Converter={StaticResource StringNotEmptyToVisibility}}" />
+
+                                <StackPanel Orientation="Horizontal" Margin="0,11,0,0">
+                                    <Button Style="{StaticResource SecondaryButton}" Content="Download installer engine"
+                                            FontSize="11" Padding="12,7" Command="{Binding Installer.SetupEngineCommand}"
+                                            Visibility="{Binding Installer.CanSetupEngine, Converter={StaticResource BoolToVisibility}}" />
+                                    <Button Style="{StaticResource GhostButton}" Content="Update engine" FontSize="11"
+                                            Command="{Binding Installer.UpdateEngineCommand}"
+                                            Visibility="{Binding Installer.CanUpdateEngine, Converter={StaticResource BoolToVisibility}}" />
+                                    <Button Style="{StaticResource GhostButton}" Content="Use existing yt-dlp.exe…" FontSize="11"
+                                            Click="BrowseYtDlp_Click" Margin="6,0,0,0" />
+                                </StackPanel>
+
+                                <StackPanel Margin="0,9,0,0"
+                                            Visibility="{Binding Installer.IsEngineBusy, Converter={StaticResource BoolToVisibility}}">
+                                    <ProgressBar Style="{StaticResource SlimProgress}" Value="{Binding Installer.EngineProgress, Mode=OneWay}"
+                                                 IsIndeterminate="{Binding Installer.EngineIndeterminate}" />
+                                    <Grid Margin="0,6,0,0">
+                                        <TextBlock Text="{Binding Installer.EngineProgressText}" Style="{StaticResource Caption}"
+                                                   MaxWidth="380" TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" />
+                                        <Button Style="{StaticResource LinkButton}" Content="Cancel" FontSize="10"
+                                                HorizontalAlignment="Right" Command="{Binding Installer.CancelEngineCommand}" />
+                                    </Grid>
+                                </StackPanel>
+
+                                <TextBlock Text="YT-DLP PATH" Style="{StaticResource SectionLabel}" Margin="0,16,0,0" />
+                                <TextBlock Text="Leave empty to use Nasaq's managed copy. A custom path lets you use an existing yt-dlp installation."
+                                           Style="{StaticResource Caption}" Margin="0,4,0,0" />
+                                <Grid Margin="0,8,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox Text="{Binding Settings.InstallerYtDlpPath, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                             VerticalContentAlignment="Center" />
+                                    <Button Grid.Column="1" Style="{StaticResource SecondaryButton}" Content="Browse…"
+                                            Padding="13,8" Margin="8,0,0,0" Click="BrowseYtDlp_Click" />
+                                </Grid>
+                                <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                                    <Button Style="{StaticResource GhostButton}" Content="Auto-detect" FontSize="11.5"
+                                            Click="AutoDetectYtDlp_Click" />
+                                    <Button Style="{StaticResource GhostButton}" Content="Open tools folder" FontSize="11.5"
+                                            Click="OpenToolsFolder_Click" Margin="4,0,0,0" />
+                                </StackPanel>
+                                <TextBlock Text="The managed engine lives in the Nasaq app-data folder and can be updated at any time."
+                                           Style="{StaticResource Caption}" Margin="0,8,0,0" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource Card}" Margin="0,10,0,0">
+                            <StackPanel>
+                                <TextBlock Text="DOWNLOAD FOLDER" Style="{StaticResource SectionLabel}" />
+                                <TextBlock Text="Installed photos, audio and video are saved here. Downloads never start on their own."
+                                           Style="{StaticResource Caption}" Margin="0,4,0,0" />
+                                <Grid Margin="0,8,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox Text="{Binding Settings.DownloadDirectory, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                             VerticalContentAlignment="Center" />
+                                    <Button Grid.Column="1" Style="{StaticResource SecondaryButton}" Content="Browse…"
+                                            Padding="13,8" Margin="8,0,0,0"
+                                            Command="{Binding Installer.BrowseDownloadFolderCommand}" />
+                                </Grid>
+                                <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                                    <Button Style="{StaticResource GhostButton}" Content="Open folder" FontSize="11.5"
+                                            Command="{Binding Installer.OpenDownloadFolderCommand}" />
+                                    <Button Style="{StaticResource GhostButton}" Content="Use output folder" FontSize="11.5"
+                                            Click="UseOutputFolder_Click" Margin="4,0,0,0" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource Card}" Margin="0,10,0,0">
+                            <StackPanel>
+                                <TextBlock Text="SIGN-IN COOKIES" Style="{StaticResource SectionLabel}" />
+                                <TextBlock Text="Some private, age-restricted or members-only posts need a signed-in session. Nasaq can borrow the local cookie store from a browser."
+                                           Style="{StaticResource Caption}" Margin="0,4,0,0" />
+                                <ComboBox Width="220" HorizontalAlignment="Left" Margin="0,8,0,0"
+                                          ItemsSource="{Binding Installer.Browsers}" DisplayMemberPath="Label"
+                                          SelectedValuePath="Id"
+                                          SelectedValue="{Binding Settings.InstallerCookiesBrowser, Mode=TwoWay}" />
+                                <TextBlock Text="No cookies are used by default. Close the browser completely if its cookie database is locked."
+                                           Style="{StaticResource Caption}" Margin="0,7,0,0" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource Card}" Margin="0,10,0,0">
+                            <StackPanel>
+                                <TextBlock Text="HOW IT WORKS" Style="{StaticResource SectionLabel}" />
+                                <TextBlock Text="Direct media links download immediately. Supported websites go through yt-dlp, which handles the page, formats and merging."
+                                           Style="{StaticResource Caption}" Margin="0,5,0,0" />
+                                <TextBlock Text="For ordinary pages, Nasaq also reads Open Graph and Twitter-card media as a fallback."
+                                           Style="{StaticResource Caption}" Margin="0,4,0,0" />
+                                <TextBlock Text="The installer accepts share text as well as bare URLs; it finds the first http(s) link."
+                                           Style="{StaticResource Caption}" Margin="0,4,0,0" />
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- ═══════════════ ABOUT ═══════════════ -->
+            <TabItem Header="About" Tag="&#xE946;">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="0,0,12,8">
+                    <StackPanel>
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel HorizontalAlignment="Center" Margin="0,10,0,10">
+                                <Image Source="pack://application:,,,/Assets/logo-256.png" Width="88" Height="88"
+                                       RenderOptions.BitmapScalingMode="HighQuality" />
+                                <TextBlock Text="Nasaq" FontFamily="{DynamicResource Font.Display}" FontSize="30"
+                                           FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,12,0,0" />
+                                <Border Background="{DynamicResource Brush.SurfaceAlt}" CornerRadius="5"
+                                        Padding="8,2" HorizontalAlignment="Center" Margin="0,6,0,0">
+                                    <TextBlock Text="{Binding VersionText}" FontFamily="{DynamicResource Font.Mono}"
+                                               FontSize="10" Foreground="{DynamicResource Brush.TextMuted}" />
+                                </Border>
+                                <TextBlock Text="{Binding Tagline}" Style="{StaticResource Caption}"
+                                           HorizontalAlignment="Center" Margin="0,9,0,0" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Background="{DynamicResource Brush.AccentSoft}" CornerRadius="14"
+                                Padding="20" Margin="0,10,0,0">
+                            <StackPanel HorizontalAlignment="Center">
+                                <TextBlock Text="DESIGNED &amp; BUILT BY" Style="{StaticResource SectionLabel}"
+                                           HorizontalAlignment="Center" Foreground="{DynamicResource Brush.Accent}" />
+                                <TextBlock Text="{Binding AuthorName}" FontFamily="{DynamicResource Font.Display}"
+                                           FontSize="19" FontWeight="SemiBold" HorizontalAlignment="Center"
+                                           Margin="0,7,0,0" />
+                                <TextBlock Text="© 2026 · All rights reserved" Style="{StaticResource Caption}"
+                                           HorizontalAlignment="Center" Margin="0,4,0,0" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource Card}" Margin="0,10,0,0">
+                            <StackPanel>
+                                <TextBlock Text="DETAILS" Style="{StaticResource SectionLabel}" />
+                                <Grid Margin="0,12,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="110" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Engine" Style="{StaticResource Caption}" />
+                                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding EngineTitle}" FontSize="11.5" Margin="0,0,0,8" />
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Runtime" Style="{StaticResource Caption}" />
+                                    <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding RuntimeText}" FontSize="11.5" Margin="0,0,0,8" />
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Operating system" Style="{StaticResource Caption}" />
+                                    <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding OsText}" FontSize="11.5"
+                                               TextWrapping="Wrap" Margin="0,0,0,8" />
+                                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Theme" Style="{StaticResource Caption}" />
+                                    <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding ThemeName}" FontSize="11.5" />
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource Card}" Margin="0,10,0,0">
+                            <StackPanel>
+                                <TextBlock Text="SHORTCUTS" Style="{StaticResource SectionLabel}" />
+                                <Grid Margin="0,12,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Summon the drop shelf" FontSize="11.5" Margin="0,0,0,7" />
+                                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding HotkeyHint}" FontFamily="{DynamicResource Font.Mono}"
+                                               FontSize="10.5" Foreground="{DynamicResource Brush.Accent}" Margin="0,0,0,7" />
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Summon it while dragging" FontSize="11.5" Margin="0,0,0,7" />
+                                    <TextBlock Grid.Row="1" Grid.Column="1" Text="Hold Ctrl" FontFamily="{DynamicResource Font.Mono}"
+                                               FontSize="10.5" Foreground="{DynamicResource Brush.Accent}" Margin="0,0,0,7" />
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Add files" FontSize="11.5" Margin="0,0,0,7" />
+                                    <TextBlock Grid.Row="2" Grid.Column="1" Text="Ctrl + O" FontFamily="{DynamicResource Font.Mono}"
+                                               FontSize="10.5" Foreground="{DynamicResource Brush.Accent}" Margin="0,0,0,7" />
+                                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Start converting" FontSize="11.5" Margin="0,0,0,7" />
+                                    <TextBlock Grid.Row="3" Grid.Column="1" Text="Ctrl + Enter" FontFamily="{DynamicResource Font.Mono}"
+                                               FontSize="10.5" Foreground="{DynamicResource Brush.Accent}" Margin="0,0,0,7" />
+                                    <TextBlock Grid.Row="4" Grid.Column="0" Text="Settings" FontSize="11.5" />
+                                    <TextBlock Grid.Row="4" Grid.Column="1" Text="Ctrl + ," FontFamily="{DynamicResource Font.Mono}"
+                                               FontSize="10.5" Foreground="{DynamicResource Brush.Accent}" />
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <TextBlock Text="Nasaq — Arabic for “order”. Built for Windows with .NET and WPF."
+                                   Style="{StaticResource Caption}" HorizontalAlignment="Center" Margin="0,14,0,4" />
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</UserControl>

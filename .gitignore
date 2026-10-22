@@ -1,0 +1,21 @@
+# Build output
+bin/
+obj/
+dist/
+build/publish/
+build/cache/
+build/selftest/
+
+# Visual Studio / Rider
+.vs/
+.idea/
+*.user
+*.suo
+*.DotSettings.user
+
+# OS junk
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log

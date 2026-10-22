@@ -1,0 +1,138 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 30
+
+    defaults:
+      run:
+        shell: pwsh
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Verify tag matches project version
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          $project = [xml](Get-Content -LiteralPath "Nasaq.csproj" -Raw)
+          $version = @($project.Project.PropertyGroup.Version) |
+                     Where-Object { $_ } |
+                     Select-Object -First 1
+          if (-not $version) {
+            throw "Could not read <Version> from Nasaq.csproj."
+          }
+          $version = $version.Trim()
+          $tag = "${{ github.ref_name }}"
+
+          Write-Host "Project version: $version"
+          Write-Host "Git tag:         $tag"
+
+          if ($tag -ne "v$version") {
+            throw "Tag '$tag' does not match <Version>$version</Version> in Nasaq.csproj. Bump the version or push the correct tag."
+          }
+
+      - name: Ensure Inno Setup 6 is available
+        run: |
+          $candidates = @(
+            "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe",
+            "$env:ProgramFiles\Inno Setup 6\ISCC.exe",
+            "$env:LOCALAPPDATA\Programs\Inno Setup 6\ISCC.exe"
+          )
+          $found = $candidates |
+                   Where-Object { $_ -and (Test-Path -LiteralPath $_) } |
+                   Select-Object -First 1
+          if ($found) {
+            Write-Host "Inno Setup is already installed: $found"
+            exit 0
+          }
+
+          Write-Host "Installing Inno Setup with Chocolatey..."
+          choco install innosetup --no-progress -y
+          if ($LASTEXITCODE -ne 0) {
+            throw "Could not install Inno Setup."
+          }
+
+      - name: Cache FFmpeg download
+        uses: actions/cache@v4
+        with:
+          path: build/cache/ffmpeg-release-essentials.zip
+          key: ffmpeg-essentials-v1
+
+      - name: Build the installer
+        run: |
+          ./build/build.ps1 -Configuration Release
+
+      - name: Add build details to the job summary
+        run: |
+          $installer = Get-ChildItem -Path "dist" -Filter "Nasaq-Setup-*.exe" -File |
+                       Select-Object -First 1
+          if (-not $installer) {
+            throw "No installer was found in dist."
+          }
+          $hash = (Get-FileHash -LiteralPath $installer.FullName -Algorithm SHA256).Hash
+          $size = [math]::Round($installer.Length / 1MB, 1)
+
+          @"
+          ### Nasaq installer
+
+          - File: ``$($installer.Name)``
+          - Size: $size MB
+          - SHA-256: ``$hash``
+          "@ | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+
+      - name: Upload the installer as a workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Nasaq-Setup
+          path: dist/Nasaq-Setup-*.exe
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Create or update the GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $tag = "${{ github.ref_name }}"
+          $assets = @(
+            Get-ChildItem -Path "dist" -Filter "Nasaq-Setup-*.exe" -File |
+            ForEach-Object { $_.FullName }
+          )
+          if ($assets.Count -eq 0) {
+            throw "No installer was found in dist."
+          }
+
+          gh release view $tag --json tagName 2>$null | Out-Null
+          if ($LASTEXITCODE -eq 0) {
+            Write-Host "Release $tag already exists. Uploading the installer."
+            gh release upload $tag @assets --clobber
+          } else {
+            Write-Host "Creating release $tag."
+            gh release create $tag @assets --title "Nasaq $tag" --generate-notes --verify-tag
+          }
+
+          if ($LASTEXITCODE -ne 0) {
+            throw "Could not publish the GitHub Release."
+          }

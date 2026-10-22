@@ -1,0 +1,533 @@
+<UserControl x:Class="Nasaq.Views.InstallerView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignHeight="630" d:DesignWidth="1080"
+             Background="Transparent">
+
+    <UserControl.Resources>
+        <Style x:Key="ModePill" TargetType="ListBoxItem">
+            <Setter Property="Foreground" Value="{DynamicResource Brush.TextMuted}" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="Margin" Value="0,0,6,0" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListBoxItem">
+                        <Border x:Name="Pill" Background="{DynamicResource Brush.SurfaceAlt}"
+                                BorderBrush="{DynamicResource Brush.Border}" BorderThickness="1"
+                                CornerRadius="8" Padding="10,7" SnapsToDevicePixels="True">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Pill" Property="BorderBrush" Value="{DynamicResource Brush.BorderStrong}" />
+                                <Setter TargetName="Pill" Property="Background" Value="{DynamicResource Brush.SurfaceHover}" />
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Pill" Property="Background" Value="{DynamicResource Brush.AccentSoft}" />
+                                <Setter TargetName="Pill" Property="BorderBrush" Value="{DynamicResource Brush.Accent}" />
+                                <Setter Property="Foreground" Value="{DynamicResource Brush.Accent}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="Chip" TargetType="Border">
+            <Setter Property="Background" Value="{DynamicResource Brush.SurfaceAlt}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource Brush.Border}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="5" />
+            <Setter Property="Padding" Value="6,2" />
+            <Setter Property="Margin" Value="0,0,5,4" />
+        </Style>
+
+        <Style x:Key="ChipText" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="9.5" />
+            <Setter Property="Foreground" Value="{DynamicResource Brush.TextFaint}" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
+
+        <Style x:Key="HistoryAction" TargetType="Button" BasedOn="{StaticResource LinkButton}">
+            <Setter Property="FontSize" Value="10.5" />
+            <Setter Property="Padding" Value="4,0" />
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Margin="22,14,22,16">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="16" />
+            <ColumnDefinition Width="300" />
+        </Grid.ColumnDefinitions>
+
+        <!-- ═══════════════════════ LEFT: LINK + STATUS ═══════════════════════ -->
+        <Grid Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="12" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="12" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <!-- Header -->
+            <Grid Grid.Row="0">
+                <StackPanel>
+                    <TextBlock Text="Installer" Style="{StaticResource PageTitle}" />
+                    <TextBlock Text="Paste a link from a social app or website. Nasaq brings the photo, audio or video to your PC."
+                               Style="{StaticResource Caption}" Margin="0,3,0,0" />
+                </StackPanel>
+                <Border Background="{DynamicResource Brush.AccentSoft}" CornerRadius="6" Padding="8,3"
+                        HorizontalAlignment="Right" VerticalAlignment="Center">
+                    <TextBlock Text="LINK → DEVICE" FontSize="8.5" FontWeight="SemiBold"
+                               Foreground="{DynamicResource Brush.Accent}" />
+                </Border>
+            </Grid>
+
+            <!-- Link card -->
+            <Border Grid.Row="2" Style="{StaticResource Card}" Padding="16,14">
+                <StackPanel>
+                    <Grid>
+                        <TextBlock Text="LINK" Style="{StaticResource SectionLabel}" Margin="4,0,0,0" />
+                        <TextBlock Text="Share links, page links and direct media URLs all work."
+                                   Style="{StaticResource Caption}" HorizontalAlignment="Right" />
+                    </Grid>
+
+                    <Grid Margin="0,9,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <Grid>
+                            <TextBox x:Name="LinkBox" Padding="0,8"
+                                     Text="{Binding Url, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                     KeyDown="LinkBox_KeyDown"
+                                     PreviewMouseLeftButtonDown="LinkBox_PreviewMouseLeftButtonDown" />
+                            <TextBlock Text="https://www.youtube.com/watch?v=…   or paste a share link"
+                                       IsHitTestVisible="False" Margin="4,0" VerticalAlignment="Center"
+                                       FontSize="12" Foreground="{DynamicResource Brush.TextFaint}"
+                                       Visibility="{Binding Url, Converter={StaticResource StringEmptyToVisibility}}" />
+                        </Grid>
+
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="6,0,0,0"
+                                    VerticalAlignment="Center">
+                            <Button Style="{StaticResource SecondaryButton}" Command="{Binding PasteCommand}"
+                                    Padding="12,8" ToolTip="Paste from the clipboard">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Style="{StaticResource IconGlyph}" Text="&#xE77F;" FontSize="12"
+                                               Margin="0,0,6,0" />
+                                    <TextBlock Text="Paste" FontSize="11.5" />
+                                </StackPanel>
+                            </Button>
+                            <Button Style="{StaticResource IconButton}" Command="{Binding ClearUrlCommand}"
+                                    ToolTip="Clear the link" Margin="2,0,0,0">
+                                <TextBlock Style="{StaticResource IconGlyph}" Text="&#xE711;" FontSize="11" />
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+
+                    <Grid Margin="0,10,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <ListBox ItemsSource="{Binding Modes}" SelectedValuePath="Id"
+                                 SelectedValue="{Binding SelectedMode, Mode=TwoWay}"
+                                 Background="Transparent" BorderThickness="0" Padding="0"
+                                 ItemContainerStyle="{StaticResource ModePill}"
+                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                 ScrollViewer.VerticalScrollBarVisibility="Disabled">
+                            <ListBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Horizontal" />
+                                </ItemsPanelTemplate>
+                            </ListBox.ItemsPanel>
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Style="{StaticResource IconGlyph}" Text="{Binding Glyph}"
+                                                   FontSize="12" Margin="0,0,6,0" />
+                                        <TextBlock Text="{Binding Label}" FontSize="11.5" FontWeight="SemiBold" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="Quality" Style="{StaticResource Caption}" VerticalAlignment="Center"
+                                       Margin="0,0,7,0" />
+                            <ComboBox Width="98" Height="31" ItemsSource="{Binding Qualities}"
+                                      DisplayMemberPath="Label" SelectedValuePath="Id"
+                                      SelectedValue="{Binding SelectedQuality, Mode=TwoWay}"
+                                      IsEnabled="{Binding CanChooseQuality}" />
+                        </StackPanel>
+                    </Grid>
+
+                    <Grid Margin="0,9,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Text="{Binding LinkHint}" Style="{StaticResource Caption}"
+                                   Margin="4,0,0,0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                            <Button Style="{StaticResource PrimaryButton}" Command="{Binding InstallCommand}"
+                                    Padding="17,9">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Style="{StaticResource IconGlyph}" Text="&#xE896;" FontSize="12"
+                                               Margin="0,0,7,0" />
+                                    <TextBlock Text="{Binding InstallButtonText}" FontSize="12" />
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- Status + history -->
+            <Grid Grid.Row="4">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="10" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <Border Grid.Row="0" Style="{StaticResource Card}" Padding="16,14">
+                    <Grid>
+                        <!-- Idle -->
+                        <StackPanel Visibility="{Binding IsIdle, Converter={StaticResource BoolToVisibility}}">
+                            <TextBlock Text="READY WHEN YOU ARE" Style="{StaticResource SectionLabel}" />
+                            <Grid Margin="0,10,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Border Width="44" Height="44" CornerRadius="12"
+                                        Background="{DynamicResource Brush.AccentSoft}">
+                                    <TextBlock Style="{StaticResource IconGlyph}" Text="&#xE896;" FontSize="19"
+                                               Foreground="{DynamicResource Brush.Accent}" />
+                                </Border>
+                                <StackPanel Grid.Column="1" Margin="12,1,0,0" VerticalAlignment="Center">
+                                    <TextBlock Text="Paste a link above to get started" FontSize="13"
+                                               FontWeight="SemiBold" />
+                                    <TextBlock Text="{Binding ModeHint}" Style="{StaticResource Caption}"
+                                               Margin="0,3,0,0" MaxWidth="400" HorizontalAlignment="Left" />
+                                    <TextBlock Text="{Binding LastNotice}" Style="{StaticResource Caption}"
+                                               Margin="0,3,0,0" Foreground="{DynamicResource Brush.Warning}"
+                                               Visibility="{Binding LastNotice, Converter={StaticResource StringNotEmptyToVisibility}}" />
+                                </StackPanel>
+                            </Grid>
+                            <WrapPanel Margin="0,12,0,0">
+                                <Border Style="{StaticResource Chip}"><TextBlock Text="YouTube" Style="{StaticResource ChipText}" /></Border>
+                                <Border Style="{StaticResource Chip}"><TextBlock Text="TikTok" Style="{StaticResource ChipText}" /></Border>
+                                <Border Style="{StaticResource Chip}"><TextBlock Text="Instagram" Style="{StaticResource ChipText}" /></Border>
+                                <Border Style="{StaticResource Chip}"><TextBlock Text="X" Style="{StaticResource ChipText}" /></Border>
+                                <Border Style="{StaticResource Chip}"><TextBlock Text="Facebook" Style="{StaticResource ChipText}" /></Border>
+                                <Border Style="{StaticResource Chip}"><TextBlock Text="Reddit" Style="{StaticResource ChipText}" /></Border>
+                                <Border Style="{StaticResource Chip}"><TextBlock Text="SoundCloud" Style="{StaticResource ChipText}" /></Border>
+                                <Border Style="{StaticResource Chip}"><TextBlock Text="direct links" Style="{StaticResource ChipText}" /></Border>
+                            </WrapPanel>
+                        </StackPanel>
+
+                        <!-- Busy -->
+                        <StackPanel Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibility}}">
+                            <Grid>
+                                <StackPanel>
+                                    <TextBlock Text="{Binding StatusTitle}" FontSize="13" FontWeight="SemiBold" />
+                                    <TextBlock Text="{Binding StatusDetail}" Style="{StaticResource Caption}"
+                                               Margin="0,3,0,0" TextTrimming="CharacterEllipsis" MaxWidth="420"
+                                               HorizontalAlignment="Left" />
+                                </StackPanel>
+                                <TextBlock Text="{Binding ProgressText}" FontFamily="{DynamicResource Font.Mono}"
+                                           FontSize="10.5" Foreground="{DynamicResource Brush.Accent}"
+                                           HorizontalAlignment="Right" VerticalAlignment="Center" />
+                            </Grid>
+                            <ProgressBar Style="{StaticResource SlimProgress}" Margin="0,11,0,0"
+                                         Value="{Binding ProgressValue, Mode=OneWay}"
+                                         IsIndeterminate="{Binding IsIndeterminate}" />
+                            <Grid Margin="0,9,0,0">
+                                <TextBlock Text="Runs in the background; the rest of Nasaq stays responsive."
+                                           Style="{StaticResource Caption}" VerticalAlignment="Center" />
+                                <Button Style="{StaticResource GhostButton}" Content="Cancel download"
+                                        FontSize="10.5" Command="{Binding CancelCommand}"
+                                        HorizontalAlignment="Right" Padding="8,3" />
+                            </Grid>
+                        </StackPanel>
+
+                        <!-- Result -->
+                        <StackPanel Visibility="{Binding HasResult, Converter={StaticResource BoolToVisibility}}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <Border Width="44" Height="44" CornerRadius="12"
+                                        Background="{DynamicResource Brush.AccentSoft}">
+                                    <TextBlock Style="{StaticResource IconGlyph}" Text="{Binding ResultGlyph}"
+                                               FontSize="19" Foreground="{DynamicResource Brush.Accent}" />
+                                </Border>
+                                <StackPanel Grid.Column="1" Margin="12,0,8,0" VerticalAlignment="Center">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="SAVED" FontSize="8.5" FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource Brush.Success}" VerticalAlignment="Center" />
+                                        <Border Background="{DynamicResource Brush.SurfaceAlt}" CornerRadius="4"
+                                                Padding="5,1" Margin="7,0,0,0">
+                                            <TextBlock Text="{Binding ResultBadge}" FontSize="8"
+                                                       FontWeight="SemiBold" Foreground="{DynamicResource Brush.TextMuted}" />
+                                        </Border>
+                                    </StackPanel>
+                                    <TextBlock Text="{Binding ResultTitle}" FontSize="13" FontWeight="SemiBold"
+                                               Margin="0,3,0,0" TextTrimming="CharacterEllipsis" MaxWidth="330"
+                                               HorizontalAlignment="Left" />
+                                    <TextBlock Text="{Binding ResultFileName}" Style="{StaticResource Caption}"
+                                               Margin="0,2,0,0" TextTrimming="CharacterEllipsis" MaxWidth="330"
+                                               HorizontalAlignment="Left" />
+                                    <TextBlock Text="{Binding ResultMeta}" Style="{StaticResource Caption}"
+                                               Margin="0,2,0,0" TextTrimming="CharacterEllipsis" MaxWidth="330"
+                                               HorizontalAlignment="Left" />
+                                </StackPanel>
+                                <StackPanel Grid.Column="2" VerticalAlignment="Center">
+                                    <Button Style="{StaticResource LinkButton}" Content="Open" FontSize="11"
+                                            Command="{Binding OpenResultCommand}" HorizontalAlignment="Right" />
+                                    <Button Style="{StaticResource LinkButton}" Content="Show in folder" FontSize="10.5"
+                                            Command="{Binding RevealResultCommand}" Margin="0,4,0,0"
+                                            HorizontalAlignment="Right" />
+                                </StackPanel>
+                            </Grid>
+                            <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                <Button Style="{StaticResource GhostButton}" Content="Install another link"
+                                        FontSize="10.5" Command="{Binding ClearResultCommand}" Padding="2,0" />
+                                <Button Style="{StaticResource GhostButton}" Content="Open downloads folder"
+                                        FontSize="10.5" Command="{Binding OpenDownloadFolderCommand}"
+                                        Margin="12,0,0,0" Padding="2,0" />
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- Error -->
+                        <StackPanel Visibility="{Binding HasError, Converter={StaticResource BoolToVisibility}}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <Border Width="44" Height="44" CornerRadius="12"
+                                        Background="{DynamicResource Brush.SurfaceAlt}">
+                                    <TextBlock Style="{StaticResource IconGlyph}" Text="&#xE7BA;" FontSize="19"
+                                               Foreground="{DynamicResource Brush.Warning}" />
+                                </Border>
+                                <StackPanel Grid.Column="1" Margin="12,0,8,0" VerticalAlignment="Center">
+                                    <TextBlock Text="COULDN'T INSTALL" FontSize="8.5" FontWeight="SemiBold"
+                                               Foreground="{DynamicResource Brush.Warning}" />
+                                    <TextBlock Text="{Binding ErrorTitle}" FontSize="12.5" FontWeight="SemiBold"
+                                               Margin="0,3,0,0" TextWrapping="Wrap" />
+                                    <TextBlock Text="{Binding ErrorHint}" Style="{StaticResource Caption}"
+                                               Margin="0,3,0,0" />
+                                </StackPanel>
+                                <StackPanel Grid.Column="2" VerticalAlignment="Center">
+                                    <Button Style="{StaticResource LinkButton}" Content="Try again" FontSize="11"
+                                            Command="{Binding InstallCommand}" HorizontalAlignment="Right" />
+                                    <Button Style="{StaticResource LinkButton}" Content="Dismiss" FontSize="10.5"
+                                            Command="{Binding ClearErrorCommand}" Margin="0,4,0,0"
+                                            HorizontalAlignment="Right" />
+                                </StackPanel>
+                            </Grid>
+                            <Border Background="{DynamicResource Brush.SurfaceAlt}" CornerRadius="8"
+                                    Padding="9,7" Margin="0,9,0,0"
+                                    Visibility="{Binding ErrorDetail, Converter={StaticResource StringNotEmptyToVisibility}}">
+                                <TextBlock Text="{Binding ErrorDetail}" FontFamily="{DynamicResource Font.Mono}"
+                                           FontSize="9.5" Foreground="{DynamicResource Brush.TextMuted}"
+                                           TextWrapping="Wrap" MaxHeight="58" />
+                            </Border>
+                            <StackPanel Orientation="Horizontal" Margin="0,9,0,0"
+                                        Visibility="{Binding CanSetupEngine, Converter={StaticResource BoolToVisibility}}">
+                                <Button Style="{StaticResource SecondaryButton}" Content="Set up the installer engine"
+                                        FontSize="10.5" Padding="10,6" Command="{Binding SetupEngineCommand}" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- History -->
+                <Grid Grid.Row="2" Visibility="{Binding HasHistory, Converter={StaticResource BoolToVisibility}}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="7" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0">
+                        <TextBlock Text="RECENT INSTALLS" Style="{StaticResource SectionLabel}" />
+                        <Button Style="{StaticResource LinkButton}" Content="Clear" FontSize="10"
+                                HorizontalAlignment="Right" Command="{Binding ClearHistoryCommand}" />
+                    </Grid>
+                    <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto"
+                                  HorizontalScrollBarVisibility="Disabled" Padding="0,0,8,0">
+                        <ItemsControl ItemsSource="{Binding History}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Style="{StaticResource Inset}" Margin="0,0,0,5" Padding="9,7">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Style="{StaticResource IconGlyph}" Text="{Binding Glyph}"
+                                                       FontSize="14" Foreground="{DynamicResource Brush.Accent}"
+                                                       Margin="0,0,9,0" />
+                                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding FileName}" FontSize="11.5"
+                                                           FontWeight="SemiBold" TextTrimming="CharacterEllipsis"
+                                                           MaxWidth="390" HorizontalAlignment="Left" />
+                                                <TextBlock Text="{Binding Meta}" Style="{StaticResource Caption}"
+                                                           Margin="0,1,0,0" />
+                                            </StackPanel>
+                                            <Button Grid.Column="2" Style="{StaticResource HistoryAction}"
+                                                    Content="Show" VerticalAlignment="Center"
+                                                    Command="{Binding DataContext.RevealHistoryItemCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                    CommandParameter="{Binding}" />
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Grid>
+            </Grid>
+        </Grid>
+
+        <!-- ═══════════════════════ RIGHT: ENGINE & FOLDERS ═══════════════════════ -->
+        <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled" Padding="0,0,8,8">
+            <StackPanel>
+
+                <!-- Engine -->
+                <Border Style="{StaticResource Card}" Padding="15,14">
+                    <StackPanel>
+                        <Grid>
+                            <TextBlock Text="INSTALLER ENGINE" Style="{StaticResource SectionLabel}"
+                                       VerticalAlignment="Center" />
+                            <Border Background="{DynamicResource Brush.SurfaceAlt}" CornerRadius="4"
+                                    Padding="5,1" HorizontalAlignment="Right">
+                                <TextBlock Text="{Binding EngineBadge}" FontSize="7.5" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource Brush.TextMuted}" />
+                            </Border>
+                        </Grid>
+
+                        <Grid Margin="0,9,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Ellipse Width="8" Height="8" VerticalAlignment="Top" Margin="0,5,8,0">
+                                <Ellipse.Style>
+                                    <Style TargetType="Ellipse">
+                                        <Setter Property="Fill" Value="{DynamicResource Brush.Warning}" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding EngineReady}" Value="True">
+                                                <Setter Property="Fill" Value="{DynamicResource Brush.Success}" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding IsEngineBusy}" Value="True">
+                                                <Setter Property="Fill" Value="{DynamicResource Brush.Accent}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Ellipse.Style>
+                            </Ellipse>
+                            <TextBlock Grid.Column="1" Text="{Binding EngineTitle}" FontSize="12"
+                                       FontWeight="SemiBold" TextWrapping="Wrap" />
+                        </Grid>
+
+                        <TextBlock Text="{Binding EngineDetail}" Style="{StaticResource Caption}" Margin="0,5,0,0" />
+                        <TextBlock Text="{Binding EngineError}" Style="{StaticResource Caption}" Margin="0,5,0,0"
+                                   Foreground="{DynamicResource Brush.Warning}"
+                                   Visibility="{Binding EngineError, Converter={StaticResource StringNotEmptyToVisibility}}" />
+
+                        <StackPanel Orientation="Horizontal" Margin="0,9,0,0">
+                            <Button Style="{StaticResource SecondaryButton}" Content="Set up engine" FontSize="10.5"
+                                    Padding="10,6" Command="{Binding SetupEngineCommand}"
+                                    Visibility="{Binding CanSetupEngine, Converter={StaticResource BoolToVisibility}}" />
+                            <Button Style="{StaticResource GhostButton}" Content="Update" FontSize="10.5"
+                                    Command="{Binding UpdateEngineCommand}" Padding="6,4"
+                                    Visibility="{Binding CanUpdateEngine, Converter={StaticResource BoolToVisibility}}" />
+                            <Button Style="{StaticResource LinkButton}" Content="Recheck" FontSize="10"
+                                    Command="{Binding RefreshEngineCommand}" VerticalAlignment="Center"
+                                    Visibility="{Binding CanRecheckEngine, Converter={StaticResource BoolToVisibility}}" />
+                        </StackPanel>
+
+                        <StackPanel Margin="0,9,0,0"
+                                    Visibility="{Binding IsEngineBusy, Converter={StaticResource BoolToVisibility}}">
+                            <ProgressBar Style="{StaticResource SlimProgress}" Value="{Binding EngineProgress, Mode=OneWay}"
+                                         IsIndeterminate="{Binding EngineIndeterminate}" />
+                            <Grid Margin="0,6,0,0">
+                                <TextBlock Text="{Binding EngineProgressText}" Style="{StaticResource Caption}"
+                                           MaxWidth="180" TextTrimming="CharacterEllipsis"
+                                           HorizontalAlignment="Left" />
+                                <Button Style="{StaticResource LinkButton}" Content="Cancel" FontSize="10"
+                                        Command="{Binding CancelEngineCommand}" HorizontalAlignment="Right" />
+                            </Grid>
+                        </StackPanel>
+
+                        <TextBlock Text="One-time setup. Nasaq stores yt-dlp in its own app data folder."
+                                   Style="{StaticResource Caption}" Margin="0,8,0,0" />
+                    </StackPanel>
+                </Border>
+
+                <!-- Download folder -->
+                <Border Style="{StaticResource Card}" Padding="15,14" Margin="0,10,0,0">
+                    <StackPanel>
+                        <TextBlock Text="SAVE DOWNLOADS TO" Style="{StaticResource SectionLabel}" />
+                        <TextBlock Text="{Binding DownloadDirectoryDisplay}" FontSize="11.5" Margin="0,7,0,0"
+                                   Foreground="{DynamicResource Brush.Text}" TextTrimming="CharacterEllipsis"
+                                   ToolTip="{Binding DownloadDirectory}" />
+                        <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                            <Button Style="{StaticResource GhostButton}" Content="Change…" FontSize="10.5"
+                                    Command="{Binding BrowseDownloadFolderCommand}" Padding="2,0" />
+                            <Button Style="{StaticResource GhostButton}" Content="Open folder" FontSize="10.5"
+                                    Command="{Binding OpenDownloadFolderCommand}" Padding="2,0" Margin="12,0,0,0" />
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- Cookies -->
+                <Border Style="{StaticResource Card}" Padding="15,14" Margin="0,10,0,0">
+                    <StackPanel>
+                        <TextBlock Text="SIGN-IN COOKIES" Style="{StaticResource SectionLabel}" />
+                        <TextBlock Text="For private or age-restricted posts, borrow the session from a browser."
+                                   Style="{StaticResource Caption}" Margin="0,4,0,0" />
+                        <ComboBox Margin="0,8,0,0" Height="31" ItemsSource="{Binding Browsers}"
+                                  DisplayMemberPath="Label" SelectedValuePath="Id"
+                                  SelectedValue="{Binding Settings.InstallerCookiesBrowser, Mode=TwoWay}" />
+                        <TextBlock Text="No cookies by default. Nasaq only points the engine at the browser's local cookie store."
+                                   Style="{StaticResource Caption}" Margin="0,6,0,0" />
+                    </StackPanel>
+                </Border>
+
+                <!-- Supported -->
+                <Border Style="{StaticResource Card}" Padding="15,14" Margin="0,10,0,0">
+                    <StackPanel>
+                        <TextBlock Text="SUPPORTED" Style="{StaticResource SectionLabel}" />
+                        <TextBlock Text="YouTube · TikTok · Instagram · X · Facebook · Reddit · Vimeo · SoundCloud · Twitch · direct media links, and 1,000+ more."
+                                   Style="{StaticResource Caption}" Margin="0,5,0,0" />
+                        <TextBlock Text="Paid, private or DRM-protected content can't be downloaded."
+                                   Style="{StaticResource Caption}" Margin="0,7,0,0"
+                                   Foreground="{DynamicResource Brush.Warning}" />
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

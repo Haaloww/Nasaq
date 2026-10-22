@@ -1,0 +1,1321 @@
+<UserControl x:Class="Nasaq.Views.EditorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:controls="clr-namespace:Nasaq.Controls"
+             mc:Ignorable="d"
+             d:DesignHeight="680" d:DesignWidth="1120"
+             Focusable="True"
+             PreviewKeyDown="EditorView_PreviewKeyDown"
+             Background="Transparent">
+
+    <UserControl.Resources>
+        <Style x:Key="ToolPill" TargetType="ListBoxItem">
+            <Setter Property="Foreground" Value="{DynamicResource Brush.TextMuted}" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="Margin" Value="2,0" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListBoxItem">
+                        <Border x:Name="Pill" Background="Transparent" BorderBrush="Transparent"
+                                BorderThickness="1" CornerRadius="9" Padding="4,7"
+                                SnapsToDevicePixels="True">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Pill" Property="Background" Value="{DynamicResource Brush.SurfaceHover}" />
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Pill" Property="Background" Value="{DynamicResource Brush.AccentSoft}" />
+                                <Setter TargetName="Pill" Property="BorderBrush" Value="{DynamicResource Brush.Accent}" />
+                                <Setter Property="Foreground" Value="{DynamicResource Brush.Accent}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="ModePill" TargetType="ListBoxItem">
+            <Setter Property="Foreground" Value="{DynamicResource Brush.TextMuted}" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="Margin" Value="0,0,5,0" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListBoxItem">
+                        <Border x:Name="Pill" Background="{DynamicResource Brush.SurfaceAlt}"
+                                BorderBrush="{DynamicResource Brush.Border}" BorderThickness="1"
+                                CornerRadius="7" Padding="9,5" SnapsToDevicePixels="True">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Pill" Property="BorderBrush" Value="{DynamicResource Brush.BorderStrong}" />
+                                <Setter TargetName="Pill" Property="Background" Value="{DynamicResource Brush.SurfaceHover}" />
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Pill" Property="Background" Value="{DynamicResource Brush.AccentSoft}" />
+                                <Setter TargetName="Pill" Property="BorderBrush" Value="{DynamicResource Brush.Accent}" />
+                                <Setter Property="Foreground" Value="{DynamicResource Brush.Accent}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="FilePick" TargetType="Button">
+            <Setter Property="Background" Value="{DynamicResource Brush.SurfaceAlt}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource Brush.Border}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="10,8" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Chrome" Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="9" Padding="{TemplateBinding Padding}"
+                                SnapsToDevicePixels="True">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Chrome" Property="Background" Value="{DynamicResource Brush.SurfaceHover}" />
+                                <Setter TargetName="Chrome" Property="BorderBrush" Value="{DynamicResource Brush.BorderStrong}" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Chrome" Property="Background" Value="{DynamicResource Brush.SurfacePressed}" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Chrome" Property="Opacity" Value="0.45" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="TinyLabel" TargetType="TextBlock" BasedOn="{StaticResource SectionLabel}">
+            <Setter Property="FontSize" Value="9" />
+        </Style>
+
+        <Style x:Key="SmallAction" TargetType="Button" BasedOn="{StaticResource IconButton}">
+            <Setter Property="Width" Value="26" />
+            <Setter Property="Height" Value="26" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Margin" Value="4,0,0,0" />
+        </Style>
+
+        <Style x:Key="PreviewAction" TargetType="Button" BasedOn="{StaticResource SecondaryButton}">
+            <Setter Property="Padding" Value="10,6" />
+            <Setter Property="FontSize" Value="10.5" />
+            <Setter Property="Margin" Value="0,0,6,0" />
+        </Style>
+
+        <Style x:Key="PdfTabItem" TargetType="ListBoxItem">
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="Margin" Value="0,0,6,0" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListBoxItem">
+                        <Border x:Name="Tab" Background="{DynamicResource Brush.SurfaceAlt}"
+                                BorderBrush="{DynamicResource Brush.Border}" BorderThickness="1"
+                                CornerRadius="7" Padding="7,5" SnapsToDevicePixels="True">
+                            <ContentPresenter />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Tab" Property="BorderBrush" Value="{DynamicResource Brush.BorderStrong}" />
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Tab" Property="Background" Value="{DynamicResource Brush.AccentSoft}" />
+                                <Setter TargetName="Tab" Property="BorderBrush" Value="{DynamicResource Brush.Accent}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="PageThumbItem" TargetType="ListBoxItem">
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="Margin" Value="0,0,4,0" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListBoxItem">
+                        <Border x:Name="Thumb" Background="Transparent" BorderBrush="Transparent"
+                                BorderThickness="2" CornerRadius="5" Padding="2" SnapsToDevicePixels="True">
+                            <ContentPresenter />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Thumb" Property="BorderBrush" Value="{DynamicResource Brush.BorderStrong}" />
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Thumb" Property="BorderBrush" Value="{DynamicResource Brush.Accent}" />
+                                <Setter TargetName="Thumb" Property="Background" Value="{DynamicResource Brush.AccentSoft}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="AudioTrackItemStyle" TargetType="ListBoxItem">
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListBoxItem">
+                        <Border x:Name="Row" Background="{DynamicResource Brush.SurfaceAlt}"
+                                BorderBrush="{DynamicResource Brush.Border}" BorderThickness="1"
+                                CornerRadius="8" Padding="8,6" Margin="0,0,0,4"
+                                SnapsToDevicePixels="True">
+                            <ContentPresenter />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Row" Property="BorderBrush" Value="{DynamicResource Brush.BorderStrong}" />
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Row" Property="Background" Value="{DynamicResource Brush.AccentSoft}" />
+                                <Setter TargetName="Row" Property="BorderBrush" Value="{DynamicResource Brush.Accent}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="NavOverlay" TargetType="Button" BasedOn="{StaticResource IconButton}">
+            <Setter Property="Width" Value="34" />
+            <Setter Property="Height" Value="52" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Background" Value="#B2080B12" />
+            <Setter Property="BorderBrush" Value="#38FFFFFF" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Opacity" Value="0.92" />
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Margin="22,12,22,14">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="10" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Grid Grid.Row="0">
+            <StackPanel>
+                <TextBlock Text="Editor" Style="{StaticResource PageTitle}" />
+                <TextBlock Text="Edit inside the live preview — crop, cut, arrange and assemble with confidence."
+                           Style="{StaticResource Caption}" Margin="0,3,0,0" />
+            </StackPanel>
+            <Border Background="{DynamicResource Brush.AccentSoft}" CornerRadius="6" Padding="8,3"
+                    HorizontalAlignment="Right" VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal">
+                    <Ellipse Width="5" Height="5" Fill="{DynamicResource Brush.Accent}"
+                             VerticalAlignment="Center" Margin="0,0,5,0" />
+                    <TextBlock Text="LIVE PREVIEW" FontSize="8.5" FontWeight="SemiBold"
+                               Foreground="{DynamicResource Brush.Accent}" />
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="292" />
+                <ColumnDefinition Width="14" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- ══════════════ Tool panel ══════════════ -->
+            <Border Grid.Column="0" Style="{StaticResource Card}" Padding="0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <ListBox Grid.Row="0" ItemsSource="{Binding Tools}"
+                             SelectedValuePath="Id" SelectedValue="{Binding ToolId, Mode=TwoWay}"
+                             ItemContainerStyle="{StaticResource ToolPill}"
+                             Background="Transparent" BorderThickness="0" Padding="8,8,8,6"
+                             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                             ScrollViewer.VerticalScrollBarVisibility="Disabled">
+                        <ListBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid Columns="4" />
+                            </ItemsPanelTemplate>
+                        </ListBox.ItemsPanel>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel HorizontalAlignment="Center">
+                                    <TextBlock Text="{Binding Glyph}" Style="{StaticResource IconGlyph}"
+                                               FontSize="14"
+                                               Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" />
+                                    <TextBlock Text="{Binding Label}" FontSize="9.5" FontWeight="SemiBold"
+                                               HorizontalAlignment="Center" Margin="0,2,0,0"
+                                               Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto"
+                                  HorizontalScrollBarVisibility="Disabled" Padding="14,0,14,12">
+                        <Grid>
+
+                            <!-- ═════════ Photo ═════════ -->
+                            <StackPanel Visibility="{Binding IsPhotoTool, Converter={StaticResource BoolToVisibility}}">
+                                <TextBlock Text="PHOTO" Style="{StaticResource TinyLabel}" />
+                                <Button Style="{StaticResource FilePick}" Command="{Binding PickPhotoCommand}"
+                                        Margin="0,6,0,0">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="30" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <Border Width="28" Height="28" CornerRadius="8"
+                                                Background="{DynamicResource Brush.AccentSoft}">
+                                            <TextBlock Style="{StaticResource IconGlyph}" Text="&#xE91B;"
+                                                       FontSize="13" Foreground="{DynamicResource Brush.Accent}" />
+                                        </Border>
+                                        <StackPanel Grid.Column="1" Margin="8,0,6,0" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding PhotoName}" FontSize="11.5" FontWeight="SemiBold"
+                                                       TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Text="{Binding PhotoMeta}" Style="{StaticResource Caption}"
+                                                       FontSize="9.5" Margin="0,2,0,0" TextTrimming="CharacterEllipsis"
+                                                       TextWrapping="NoWrap" />
+                                        </StackPanel>
+                                        <TextBlock Grid.Column="2" Text="Browse" FontSize="9.5"
+                                                   Foreground="{DynamicResource Brush.Accent}"
+                                                   VerticalAlignment="Center" />
+                                    </Grid>
+                                </Button>
+
+                                <Border Background="{DynamicResource Brush.SurfaceAlt}" BorderBrush="{DynamicResource Brush.Border}"
+                                        BorderThickness="1" CornerRadius="8" Padding="10,8" Margin="0,10,0,0">
+                                    <StackPanel>
+                                        <TextBlock Text="CROP IN THE PREVIEW" Style="{StaticResource TinyLabel}" />
+                                        <TextBlock Text="Drag inside the box to move it, drag an edge or corner to resize, or drag outside it to start a new crop."
+                                                   Style="{StaticResource Caption}" FontSize="9.5" TextWrapping="Wrap"
+                                                   Margin="0,4,0,0" />
+                                        <TextBlock Text="{Binding CropSummary}" FontFamily="{DynamicResource Font.Mono}"
+                                                   FontSize="10.5" Foreground="{DynamicResource Brush.Accent}"
+                                                   Margin="0,7,0,0" />
+                                    </StackPanel>
+                                </Border>
+
+                                <TextBlock Text="OUTPUT" Style="{StaticResource TinyLabel}" Margin="0,12,0,0" />
+                                <Grid Margin="0,6,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <ComboBox ItemsSource="{Binding PhotoFormats}" DisplayMemberPath="Label"
+                                              SelectedValuePath="Id" SelectedValue="{Binding PhotoFormatId, Mode=TwoWay}" />
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="8,0,0,0"
+                                                VerticalAlignment="Center">
+                                        <TextBlock Text="Quality" Style="{StaticResource Caption}" />
+                                        <TextBlock Text="{Binding PhotoQualityText}" Style="{StaticResource Caption}"
+                                                   FontFamily="{DynamicResource Font.Mono}" Margin="4,0,0,0" />
+                                    </StackPanel>
+                                </Grid>
+                                <Slider Style="{StaticResource SlimSlider}" Minimum="30" Maximum="100"
+                                        Value="{Binding PhotoQuality, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            </StackPanel>
+
+                            <!-- ═════════ Video ═════════ -->
+                            <StackPanel Visibility="{Binding IsVideoTool, Converter={StaticResource BoolToVisibility}}">
+                                <TextBlock Text="VIDEO" Style="{StaticResource TinyLabel}" />
+                                <Button Style="{StaticResource FilePick}" Command="{Binding PickVideoCommand}"
+                                        Margin="0,6,0,0">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="30" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <Border Width="28" Height="28" CornerRadius="8"
+                                                Background="{DynamicResource Brush.AccentSoft}">
+                                            <TextBlock Style="{StaticResource IconGlyph}" Text="&#xE714;"
+                                                       FontSize="13" Foreground="{DynamicResource Brush.Accent}" />
+                                        </Border>
+                                        <StackPanel Grid.Column="1" Margin="8,0,6,0" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding VideoName}" FontSize="11.5" FontWeight="SemiBold"
+                                                       TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Text="{Binding VideoMeta}" Style="{StaticResource Caption}"
+                                                       FontSize="9.5" Margin="0,2,0,0" TextTrimming="CharacterEllipsis"
+                                                       TextWrapping="NoWrap" />
+                                        </StackPanel>
+                                        <TextBlock Grid.Column="2" Text="Browse" FontSize="9.5"
+                                                   Foreground="{DynamicResource Brush.Accent}"
+                                                   VerticalAlignment="Center" />
+                                    </Grid>
+                                </Button>
+
+                                <Border Background="{DynamicResource Brush.SurfaceAlt}" BorderBrush="{DynamicResource Brush.Border}"
+                                        BorderThickness="1" CornerRadius="8" Padding="10,8" Margin="0,10,0,0">
+                                    <StackPanel>
+                                        <TextBlock Text="CUT IN THE PREVIEW" Style="{StaticResource TinyLabel}" />
+                                        <TextBlock Text="Press play under the video. Drag the white handles on the timeline to set the cut, or move the playhead and use Set start / Set end."
+                                                   Style="{StaticResource Caption}" FontSize="9.5" TextWrapping="Wrap"
+                                                   Margin="0,4,0,0" />
+                                    </StackPanel>
+                                </Border>
+
+                                <TextBlock Text="OUTPUT" Style="{StaticResource TinyLabel}" Margin="0,12,0,0" />
+                                <Grid Margin="0,5,0,0">
+                                    <TextBlock Text="Quality" Style="{StaticResource Caption}" />
+                                    <TextBlock Text="{Binding VideoQualityText}" Style="{StaticResource Caption}"
+                                               HorizontalAlignment="Right" FontFamily="{DynamicResource Font.Mono}" />
+                                </Grid>
+                                <Slider Style="{StaticResource SlimSlider}" Minimum="14" Maximum="32"
+                                        Value="{Binding VideoQuality, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                <Grid Margin="0,5,0,0">
+                                    <TextBlock Text="Audio" Style="{StaticResource Caption}" VerticalAlignment="Center" />
+                                    <ComboBox Width="92" Height="30" HorizontalAlignment="Right"
+                                              ItemsSource="{Binding AudioBitrates}"
+                                              SelectedItem="{Binding VideoAudioBitrate, Mode=TwoWay}" />
+                                </Grid>
+                            </StackPanel>
+
+                            <!-- ═════════ Audio ═════════ -->
+                            <StackPanel Visibility="{Binding IsAudioTool, Converter={StaticResource BoolToVisibility}}">
+                                <TextBlock Text="AUDIO" Style="{StaticResource TinyLabel}" />
+                                <ListBox ItemsSource="{Binding AudioModes}" SelectedValuePath="Id"
+                                         SelectedValue="{Binding AudioModeId, Mode=TwoWay}"
+                                         ItemContainerStyle="{StaticResource ModePill}"
+                                         Background="Transparent" BorderThickness="0" Padding="0" Margin="0,6,0,0"
+                                         ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                         ScrollViewer.VerticalScrollBarVisibility="Disabled">
+                                    <ListBox.ItemsPanel>
+                                        <ItemsPanelTemplate><StackPanel Orientation="Horizontal" /></ItemsPanelTemplate>
+                                    </ListBox.ItemsPanel>
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="{Binding Glyph}" Style="{StaticResource IconGlyph}"
+                                                           FontSize="11" Margin="0,0,4,0"
+                                                           Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" />
+                                                <TextBlock Text="{Binding Label}" FontSize="9.5" FontWeight="SemiBold"
+                                                           Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+
+                                <Button Style="{StaticResource FilePick}" Command="{Binding PickAudioCommand}"
+                                        Margin="0,8,0,0">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="30" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <Border Width="28" Height="28" CornerRadius="8"
+                                                Background="{DynamicResource Brush.AccentSoft}">
+                                            <TextBlock Style="{StaticResource IconGlyph}" Text="&#xE8D6;"
+                                                       FontSize="13" Foreground="{DynamicResource Brush.Accent}" />
+                                        </Border>
+                                        <StackPanel Grid.Column="1" Margin="8,0,6,0" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding PickButtonText}" FontSize="11.5" FontWeight="SemiBold"
+                                                       TextTrimming="CharacterEllipsis" />
+                                            <TextBlock FontSize="9.5"
+                                                       Margin="0,2,0,0" TextTrimming="CharacterEllipsis"
+                                                       TextWrapping="NoWrap">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock" BasedOn="{StaticResource Caption}">
+                                                        <Setter Property="Text" Value="{Binding AudioMeta}" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsAudioMerge}" Value="True">
+                                                                <Setter Property="Text" Value="{Binding AudioMergeTotalText}" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                        </StackPanel>
+                                        <TextBlock Grid.Column="2" Text="Browse" FontSize="9.5"
+                                                   Foreground="{DynamicResource Brush.Accent}"
+                                                   VerticalAlignment="Center" />
+                                    </Grid>
+                                </Button>
+
+                                <Border Background="{DynamicResource Brush.SurfaceAlt}" BorderBrush="{DynamicResource Brush.Border}"
+                                        BorderThickness="1" CornerRadius="8" Padding="10,8" Margin="0,10,0,0">
+                                    <StackPanel>
+                                        <TextBlock Text="TIMELINE" Style="{StaticResource TinyLabel}" />
+                                        <TextBlock FontSize="9.5" TextWrapping="Wrap" Margin="0,4,0,0">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock" BasedOn="{StaticResource Caption}">
+                                                    <Setter Property="Text" Value="Press play and drag the trim handles on the waveform. Use Set start / Set end for exact points." />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsAudioMerge}" Value="True">
+                                                            <Setter Property="Text" Value="Arrange clips under the timeline, then split one at the playhead. Move or remove pieces before merging." />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </StackPanel>
+                                </Border>
+
+                                <TextBlock Text="OUTPUT" Style="{StaticResource TinyLabel}" Margin="0,10,0,0" />
+                                <Grid Margin="0,6,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <ComboBox ItemsSource="{Binding AudioFormats}" DisplayMemberPath="Label"
+                                              SelectedValuePath="Id" SelectedValue="{Binding AudioFormatId, Mode=TwoWay}" />
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="8,0,0,0"
+                                                VerticalAlignment="Center">
+                                        <TextBlock Text="Bitrate" Style="{StaticResource Caption}" />
+                                        <ComboBox Width="82" Height="30" Margin="5,0,0,0"
+                                                  ItemsSource="{Binding AudioBitrates}"
+                                                  SelectedItem="{Binding AudioBitrate, Mode=TwoWay}" />
+                                    </StackPanel>
+                                </Grid>
+                            </StackPanel>
+
+                            <!-- ═════════ PDF ═════════ -->
+                            <StackPanel Visibility="{Binding IsPdfTool, Converter={StaticResource BoolToVisibility}}">
+                                <TextBlock Text="PDF WORKSPACE" Style="{StaticResource TinyLabel}" />
+                                <Button Style="{StaticResource FilePick}" Command="{Binding PickPdfCommand}"
+                                        Margin="0,6,0,0">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="30" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <Border Width="28" Height="28" CornerRadius="8"
+                                                Background="{DynamicResource Brush.AccentSoft}">
+                                            <TextBlock Style="{StaticResource IconGlyph}" Text="&#xE710;"
+                                                       FontSize="13" Foreground="{DynamicResource Brush.Accent}" />
+                                        </Border>
+                                        <StackPanel Grid.Column="1" Margin="8,0,6,0" VerticalAlignment="Center">
+                                            <TextBlock Text="Add PDFs" FontSize="11.5" FontWeight="SemiBold" />
+                                            <TextBlock Text="{Binding PdfFilesSummary}" Style="{StaticResource Caption}"
+                                                       FontSize="9.5" Margin="0,2,0,0" TextTrimming="CharacterEllipsis"
+                                                       TextWrapping="NoWrap" />
+                                        </StackPanel>
+                                        <TextBlock Grid.Column="2" Text="Browse" FontSize="9.5"
+                                                   Foreground="{DynamicResource Brush.Accent}"
+                                                   VerticalAlignment="Center" />
+                                    </Grid>
+                                </Button>
+
+                                <Border Background="{DynamicResource Brush.SurfaceAlt}" BorderBrush="{DynamicResource Brush.Border}"
+                                        BorderThickness="1" CornerRadius="8" Padding="10,8" Margin="0,10,0,0">
+                                    <StackPanel>
+                                        <TextBlock Text="ONE WORKSPACE" Style="{StaticResource TinyLabel}" />
+                                        <TextBlock Text="Every PDF stays listed in the preview. Browse any document, then merge all files, split pages, or save pages as images."
+                                                   Style="{StaticResource Caption}" FontSize="9.5" TextWrapping="Wrap"
+                                                   Margin="0,4,0,0" />
+                                    </StackPanel>
+                                </Border>
+
+                                <TextBlock Text="IMAGE EXPORT" Style="{StaticResource TinyLabel}" Margin="0,12,0,0" />
+                                <Grid Margin="0,6,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <ComboBox ItemsSource="{Binding PdfImageFormats}" DisplayMemberPath="Label"
+                                              SelectedValuePath="Id" SelectedValue="{Binding PdfImageFormatId, Mode=TwoWay}" />
+                                    <ComboBox Grid.Column="1" Width="96" Margin="6,0,0,0"
+                                              ItemsSource="{Binding PdfImageEdges}"
+                                              SelectedItem="{Binding PdfImageEdge, Mode=TwoWay}" />
+                                </Grid>
+                                <Grid Margin="0,4,0,0">
+                                    <TextBlock Text="Image quality" Style="{StaticResource Caption}" />
+                                    <TextBlock Text="{Binding PdfImageQualityText}" Style="{StaticResource Caption}"
+                                               HorizontalAlignment="Right" FontFamily="{DynamicResource Font.Mono}" />
+                                </Grid>
+                                <Slider Style="{StaticResource SlimSlider}" Minimum="30" Maximum="100"
+                                        Value="{Binding PdfImageQuality, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                <TextBlock Text="Long edge in pixels is selected above. Split and image actions live inside the preview."
+                                           Style="{StaticResource Caption}" FontSize="9" TextWrapping="Wrap" Margin="0,4,0,0" />
+                            </StackPanel>
+                        </Grid>
+                    </ScrollViewer>
+                </Grid>
+            </Border>
+
+            <!-- ══════════════ Preview + actions ══════════════ -->
+            <Grid Grid.Column="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="10" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Border Grid.Row="0" Style="{StaticResource Card}" Padding="0" ClipToBounds="True">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <!-- Preview header -->
+                        <Border Grid.Row="0" BorderBrush="{DynamicResource Brush.Border}" BorderThickness="0,0,0,1"
+                                Padding="14,9">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Orientation="Horizontal">
+                                    <Border Width="26" Height="26" CornerRadius="7"
+                                            Background="{DynamicResource Brush.AccentSoft}">
+                                        <TextBlock Style="{StaticResource IconGlyph}" Text="{Binding ToolGlyph}" FontSize="12"
+                                                   Foreground="{DynamicResource Brush.Accent}" />
+                                    </Border>
+                                    <StackPanel Margin="8,0,0,0" VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding PreviewTitle}" FontSize="11.5" FontWeight="SemiBold"
+                                                   TextTrimming="CharacterEllipsis" MaxWidth="300" />
+                                        <TextBlock Text="{Binding PreviewSubtitle}" Style="{StaticResource Caption}"
+                                                   FontSize="9.5" Margin="0,1,0,0" TextTrimming="CharacterEllipsis"
+                                                   TextWrapping="NoWrap" MaxWidth="330" />
+                                    </StackPanel>
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding PreviewLiveText}" Style="{StaticResource Caption}"
+                                               FontSize="9" VerticalAlignment="Center" Margin="0,0,7,0" />
+                                    <Button Content="Stop" Style="{StaticResource LinkButton}"
+                                            Command="{Binding CancelPreviewCommand}" FontSize="9.5"
+                                            Padding="3,1" Margin="0,0,7,0"
+                                            Visibility="{Binding IsPreviewBusy, Converter={StaticResource BoolToVisibility}}" />
+                                    <Border Background="{DynamicResource Brush.SurfaceAlt}" CornerRadius="5" Padding="6,2"
+                                            Margin="0,0,8,0">
+                                        <TextBlock Text="{Binding PreviewBadge}" FontFamily="{DynamicResource Font.Mono}"
+                                                   FontSize="8.5" Foreground="{DynamicResource Brush.TextMuted}" />
+                                    </Border>
+                                    <Button Style="{StaticResource GhostButton}" Command="{Binding CancelEditCommand}"
+                                            Padding="8,5" FontSize="9.5"
+                                            ToolTip="Remove this file and stop editing"
+                                            Visibility="{Binding HasActiveEdit, Converter={StaticResource BoolToVisibility}}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Style="{StaticResource IconGlyph}" Text="&#xE711;" FontSize="9"
+                                                       Margin="0,0,4,0" Foreground="{DynamicResource Brush.Danger}" />
+                                            <TextBlock Text="Cancel edit" />
+                                        </StackPanel>
+                                    </Button>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <!-- Preview body -->
+                        <Grid x:Name="PreviewSurface" Grid.Row="1" Background="{DynamicResource Brush.WindowBg}"
+                              ClipToBounds="True" MouseLeftButtonDown="PreviewSurface_MouseLeftButtonDown">
+                            <Grid Margin="10">
+
+                                <!-- Photo workspace -->
+                                <Grid Visibility="{Binding IsPhotoTool, Converter={StaticResource BoolToVisibility}}">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <Grid Grid.Row="0" Background="#080A0F" ClipToBounds="True">
+                                        <controls:AutoPreviewPanel
+                                            AspectWidth="{Binding PhotoSourceWidth}"
+                                            AspectHeight="{Binding PhotoSourceHeight}"
+                                            MinimumPreviewWidth="180"
+                                            MinimumPreviewHeight="120">
+                                            <Grid>
+                                                <Image Source="{Binding PhotoPreview}" Stretch="Uniform"
+                                                       RenderOptions.BitmapScalingMode="HighQuality" />
+                                                <controls:PhotoCropOverlay
+                                                    SourceWidth="{Binding PhotoSourceWidth}"
+                                                    SourceHeight="{Binding PhotoSourceHeight}"
+                                                    CropRect="{Binding PhotoCropRect, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                    Accent="{DynamicResource Brush.Accent}"
+                                                    CropChangedByUser="PhotoCropOverlay_CropChangedByUser" />
+                                            </Grid>
+                                        </controls:AutoPreviewPanel>
+                                    </Grid>
+                                    <Border Grid.Row="1" Background="{DynamicResource Brush.Surface}"
+                                            BorderBrush="{DynamicResource Brush.Border}" BorderThickness="0,1,0,0"
+                                            Padding="10,7">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                <TextBlock Text="Aspect" Style="{StaticResource Caption}"
+                                                           VerticalAlignment="Center" Margin="0,0,6,0" />
+                                                <ItemsControl ItemsSource="{Binding CropAspects}" VerticalAlignment="Center">
+                                                    <ItemsControl.ItemsPanel>
+                                                        <ItemsPanelTemplate><StackPanel Orientation="Horizontal" /></ItemsPanelTemplate>
+                                                    </ItemsControl.ItemsPanel>
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <Button Content="{Binding Label}" Style="{StaticResource PreviewAction}"
+                                                                    Command="{Binding DataContext.CropAspectCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                                    CommandParameter="{Binding Id}" Padding="7,4" Margin="0,0,4,0"
+                                                                    ToolTip="{Binding Detail}" />
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                                <TextBlock Text="{Binding CropSummary}" Style="{StaticResource Caption}"
+                                                           FontFamily="{DynamicResource Font.Mono}" FontSize="9.5"
+                                                           VerticalAlignment="Center" Margin="8,0,0,0" />
+                                            </StackPanel>
+                                            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                                <Button Content="Center" Style="{StaticResource PreviewAction}"
+                                                        Command="{Binding CenterCropCommand}" Padding="8,4" />
+                                                <Button Content="Reset" Style="{StaticResource PreviewAction}"
+                                                        Command="{Binding ResetCropCommand}" Padding="8,4" Margin="0" />
+                                            </StackPanel>
+                                        </Grid>
+                                    </Border>
+                                </Grid>
+
+                                <!-- Video workspace -->
+                                <Grid Visibility="{Binding IsVideoTool, Converter={StaticResource BoolToVisibility}}">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <Grid Grid.Row="0" Background="#080A0F" ClipToBounds="True">
+                                        <controls:AutoPreviewPanel
+                                            AspectWidth="{Binding VideoFrameWidth}"
+                                            AspectHeight="{Binding VideoFrameHeight}"
+                                            MinimumPreviewWidth="220"
+                                            MinimumPreviewHeight="140">
+                                            <Grid>
+                                                <MediaElement x:Name="VideoPlayer" LoadedBehavior="Manual" UnloadedBehavior="Manual"
+                                                      ScrubbingEnabled="True" Stretch="Uniform"
+                                                      MediaOpened="VideoPlayer_MediaOpened"
+                                                      MediaEnded="VideoPlayer_MediaEnded"
+                                                      MediaFailed="VideoPlayer_MediaFailed"
+                                                      Visibility="Collapsed" />
+                                        <Image Source="{Binding VideoPreview}" Stretch="Uniform"
+                                               RenderOptions.BitmapScalingMode="HighQuality"
+                                               Visibility="{Binding ShowVideoFallback, Converter={StaticResource BoolToVisibility}}" />
+                                        <Button x:Name="VideoPlayOverlay" Width="56" Height="56"
+                                                HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                Click="PlayPause_Click"
+                                                ToolTip="{Binding PlaybackLabel}"
+                                                Visibility="{Binding ShowVideoPlayOverlay, Converter={StaticResource BoolToVisibility}}"
+                                                Focusable="False">
+                                            <Button.Template>
+                                                <ControlTemplate TargetType="Button">
+                                                    <Grid>
+                                                        <Ellipse Fill="#C2080B12" Stroke="#66FFFFFF" StrokeThickness="1" />
+                                                        <TextBlock Text="{Binding PlaybackGlyph}" Style="{StaticResource IconGlyph}"
+                                                                   FontSize="20" Foreground="White"
+                                                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                    </Grid>
+                                                    <ControlTemplate.Triggers>
+                                                        <Trigger Property="IsMouseOver" Value="True">
+                                                            <Setter Property="Opacity" Value="0.86" />
+                                                        </Trigger>
+                                                    </ControlTemplate.Triggers>
+                                                </ControlTemplate>
+                                            </Button.Template>
+                                        </Button>
+                                        <Border VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="10"
+                                                Background="#B2080B12" CornerRadius="6" Padding="7,4"
+                                                Visibility="{Binding VideoPlaybackNotice, Converter={StaticResource StringNotEmptyToVisibility}}">
+                                            <TextBlock Text="{Binding VideoPlaybackNotice}" Foreground="{DynamicResource Brush.Warning}"
+                                                       FontSize="9" MaxWidth="420" TextWrapping="Wrap" />
+                                        </Border>
+                                            </Grid>
+                                        </controls:AutoPreviewPanel>
+                                    </Grid>
+                                    <Border Grid.Row="1" Background="{DynamicResource Brush.Surface}"
+                                            BorderBrush="{DynamicResource Brush.Border}" BorderThickness="0,1,0,0"
+                                            Padding="10,7">
+                                        <StackPanel>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <Button Style="{StaticResource IconButton}" Click="PlayPause_Click"
+                                                        ToolTip="{Binding PlaybackLabel}" Width="32" Height="32"
+                                                        Padding="0" Margin="0,0,8,0" Focusable="False">
+                                                    <TextBlock Style="{StaticResource IconGlyph}" Text="{Binding PlaybackGlyph}"
+                                                               FontSize="14" />
+                                                </Button>
+                                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                    <controls:MediaTimeline x:Name="VideoTimeline" Height="42"
+                                                        Duration="{Binding VideoDuration, Mode=OneWay}"
+                                                        Start="{Binding VideoStart, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                        End="{Binding VideoEnd, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                        Position="{Binding VideoPosition, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                        ShowSelection="True"
+                                                        Accent="{DynamicResource Brush.Accent}"
+                                                        SeekRequested="VideoTimeline_SeekRequested"
+                                                        RangeChanged="Timeline_RangeChanged" />
+                                                    <Grid Margin="0,3,0,0">
+                                                        <TextBlock Text="{Binding VideoPositionText}" Style="{StaticResource Caption}"
+                                                                   FontFamily="{DynamicResource Font.Mono}" FontSize="9" />
+                                                        <TextBlock Style="{StaticResource Caption}" FontFamily="{DynamicResource Font.Mono}"
+                                                                   FontSize="9" HorizontalAlignment="Right">
+                                                            <Run Text="{Binding VideoStartText, Mode=OneWay}" />
+                                                            <Run Text="  →  " />
+                                                            <Run Text="{Binding VideoEndText, Mode=OneWay}" />
+                                                            <Run Text="  /  " />
+                                                            <Run Text="{Binding VideoDuration, Mode=OneWay, StringFormat={}{0:0.0}s}" />
+                                                        </TextBlock>
+                                                    </Grid>
+                                                </StackPanel>
+                                                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0,0,0">
+                                                    <Button Content="Set start" Style="{StaticResource PreviewAction}"
+                                                            Command="{Binding SetVideoStartCommand}" Padding="8,4" />
+                                                    <Button Content="Set end" Style="{StaticResource PreviewAction}"
+                                                            Command="{Binding SetVideoEndCommand}" Padding="8,4" />
+                                                    <Button Content="Whole clip" Style="{StaticResource PreviewAction}"
+                                                            Command="{Binding UseWholeVideoCommand}" Padding="8,4" />
+                                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="4,0,0,0">
+                                                        <TextBlock Text="Loop" Style="{StaticResource Caption}" VerticalAlignment="Center"
+                                                                   Margin="0,0,5,0" />
+                                                        <ToggleButton Style="{StaticResource ToggleSwitch}"
+                                                                      IsChecked="{Binding LoopMedia, Mode=TwoWay}" />
+                                                    </StackPanel>
+                                                </StackPanel>
+                                            </Grid>
+                                        </StackPanel>
+                                    </Border>
+                                </Grid>
+
+                                <!-- Audio workspace -->
+                                <Grid Visibility="{Binding IsAudioTool, Converter={StaticResource BoolToVisibility}}">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+
+                                    <Border Grid.Row="0" Background="{DynamicResource Brush.Surface}"
+                                            BorderBrush="{DynamicResource Brush.Border}" BorderThickness="0,0,0,1"
+                                            Padding="10,6">
+                                        <Grid>
+                                            <TextBlock Text="AUDIO MODE" Style="{StaticResource TinyLabel}"
+                                                       VerticalAlignment="Center" />
+                                            <ListBox ItemsSource="{Binding AudioModes}" SelectedValuePath="Id"
+                                                     SelectedValue="{Binding AudioModeId, Mode=TwoWay}"
+                                                     ItemContainerStyle="{StaticResource ModePill}"
+                                                     Background="Transparent" BorderThickness="0" Padding="0"
+                                                     HorizontalAlignment="Right"
+                                                     ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                                     ScrollViewer.VerticalScrollBarVisibility="Disabled">
+                                                <ListBox.ItemsPanel>
+                                                    <ItemsPanelTemplate><StackPanel Orientation="Horizontal" /></ItemsPanelTemplate>
+                                                </ListBox.ItemsPanel>
+                                                <ListBox.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <TextBlock Text="{Binding Glyph}" Style="{StaticResource IconGlyph}"
+                                                                       FontSize="10" Margin="0,0,4,0"
+                                                                       Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" />
+                                                            <TextBlock Text="{Binding Label}" FontSize="9.5" FontWeight="SemiBold"
+                                                                       Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" />
+                                                        </StackPanel>
+                                                    </DataTemplate>
+                                                </ListBox.ItemTemplate>
+                                            </ListBox>
+                                        </Grid>
+                                    </Border>
+
+                                    <!-- Trim audio -->
+                                    <Grid Grid.Row="1" Visibility="{Binding IsAudioTrim, Converter={StaticResource BoolToVisibility}}">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="*" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+                                        <Border Grid.Row="0" Background="#080A0F" Margin="0" Padding="8">
+                                            <controls:AutoPreviewPanel
+                                                AspectSource="{Binding AudioWaveform}"
+                                                MinimumPreviewWidth="260"
+                                                MinimumPreviewHeight="120">
+                                                <Grid>
+                                                    <controls:MediaTimeline x:Name="AudioTimeline"
+                                                        Duration="{Binding AudioDuration, Mode=OneWay}"
+                                                        Start="{Binding AudioStart, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                        End="{Binding AudioEnd, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                        Position="{Binding AudioPosition, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                        BackgroundImage="{Binding AudioWaveform}"
+                                                        ShowSelection="True"
+                                                        Accent="{DynamicResource Brush.Accent}"
+                                                        SeekRequested="AudioTimeline_SeekRequested"
+                                                        RangeChanged="Timeline_RangeChanged" />
+                                                    <Border VerticalAlignment="Top" HorizontalAlignment="Left" Margin="8"
+                                                            Background="#B2080B12" CornerRadius="5" Padding="6,3">
+                                                        <TextBlock Text="{Binding AudioName}" Foreground="#D8FFFFFF"
+                                                                   FontSize="9" TextTrimming="CharacterEllipsis" MaxWidth="360" />
+                                                    </Border>
+                                                </Grid>
+                                            </controls:AutoPreviewPanel>
+                                        </Border>
+                                        <Border Grid.Row="1" Background="{DynamicResource Brush.Surface}"
+                                                BorderBrush="{DynamicResource Brush.Border}" BorderThickness="0,1,0,0"
+                                                Padding="10,7">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <Button Style="{StaticResource IconButton}" Click="PlayPause_Click"
+                                                        ToolTip="{Binding PlaybackLabel}" Width="32" Height="32"
+                                                        Padding="0" Margin="0,0,8,0" Focusable="False">
+                                                    <TextBlock Style="{StaticResource IconGlyph}" Text="{Binding PlaybackGlyph}"
+                                                               FontSize="14" />
+                                                </Button>
+                                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                    <Grid>
+                                                        <TextBlock Text="{Binding AudioPositionText}" Style="{StaticResource Caption}"
+                                                                   FontFamily="{DynamicResource Font.Mono}" FontSize="9" />
+                                                        <TextBlock Style="{StaticResource Caption}" FontFamily="{DynamicResource Font.Mono}"
+                                                                   FontSize="9" HorizontalAlignment="Right">
+                                                            <Run Text="{Binding AudioStartText, Mode=OneWay}" />
+                                                            <Run Text="  →  " />
+                                                            <Run Text="{Binding AudioEndText, Mode=OneWay}" />
+                                                            <Run Text="  /  " />
+                                                            <Run Text="{Binding AudioDuration, Mode=OneWay, StringFormat={}{0:0.0}s}" />
+                                                        </TextBlock>
+                                                    </Grid>
+                                                    <TextBlock Text="{Binding AudioClipLengthText, StringFormat='Selected clip · {0}'}"
+                                                               Style="{StaticResource Caption}" FontSize="9" Margin="0,2,0,0" />
+                                                </StackPanel>
+                                                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0,0,0">
+                                                    <Button Content="Set start" Style="{StaticResource PreviewAction}"
+                                                            Command="{Binding SetAudioStartCommand}" Padding="8,4" />
+                                                    <Button Content="Set end" Style="{StaticResource PreviewAction}"
+                                                            Command="{Binding SetAudioEndCommand}" Padding="8,4" />
+                                                    <Button Content="Whole file" Style="{StaticResource PreviewAction}"
+                                                            Command="{Binding UseWholeAudioCommand}" Padding="8,4" />
+                                                </StackPanel>
+                                            </Grid>
+                                        </Border>
+                                    </Grid>
+
+                                    <!-- Merge audio -->
+                                    <Grid Grid.Row="1" Visibility="{Binding IsAudioMerge, Converter={StaticResource BoolToVisibility}}">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="*" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+                                        <Border Grid.Row="0" Background="#080A0F" Padding="8,7">
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto" />
+                                                    <RowDefinition Height="Auto" />
+                                                </Grid.RowDefinitions>
+                                                <controls:MediaTimeline x:Name="AudioMergeTimeline" Height="54"
+                                                    Duration="{Binding AudioMergeDuration, Mode=OneWay}"
+                                                    Start="0"
+                                                    End="{Binding AudioMergeDuration, Mode=OneWay}"
+                                                    Position="{Binding AudioMergePosition, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                    Segments="{Binding AudioTracks}"
+                                                    ShowSelection="False"
+                                                    Accent="{DynamicResource Brush.Accent}"
+                                                    SeekRequested="AudioMergeTimeline_SeekRequested" />
+                                                <Grid Grid.Row="1" Margin="0,4,0,0">
+                                                    <TextBlock Text="{Binding AudioMergePositionText}" Style="{StaticResource Caption}"
+                                                               FontFamily="{DynamicResource Font.Mono}" FontSize="9" />
+                                                    <TextBlock Text="{Binding AudioMergeTotalText}" Style="{StaticResource Caption}"
+                                                               FontSize="9" HorizontalAlignment="Right" />
+                                                </Grid>
+                                            </Grid>
+                                        </Border>
+                                        <ListBox Grid.Row="1" ItemsSource="{Binding AudioTracks}"
+                                                 SelectedItem="{Binding AudioSelectedTrack, Mode=TwoWay}"
+                                                 ItemContainerStyle="{StaticResource AudioTrackItemStyle}"
+                                                 Background="Transparent" BorderThickness="0" Padding="4,5"
+                                                 ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                            <ListBox.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="26" />
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="Auto" />
+                                                        </Grid.ColumnDefinitions>
+                                                        <Border Width="24" Height="24" CornerRadius="6"
+                                                                Background="{DynamicResource Brush.Surface}">
+                                                            <TextBlock Text="{Binding OrderText}" FontFamily="{DynamicResource Font.Mono}"
+                                                                       FontSize="9" Foreground="{DynamicResource Brush.Accent}"
+                                                                       HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                        </Border>
+                                                        <StackPanel Grid.Column="1" Margin="7,0,8,0" VerticalAlignment="Center">
+                                                            <TextBlock Text="{Binding FileName}" FontSize="10.5"
+                                                                       FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                                                            <TextBlock Text="{Binding Meta}" Style="{StaticResource Caption}"
+                                                                       FontSize="9" Margin="0,1,0,0" TextTrimming="CharacterEllipsis" />
+                                                        </StackPanel>
+                                                        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                                                            <TextBlock Text="{Binding RangeText}" Style="{StaticResource Caption}"
+                                                                       FontFamily="{DynamicResource Font.Mono}" FontSize="9"
+                                                                       VerticalAlignment="Center" Margin="0,0,4,0" />
+                                                            <Button Style="{StaticResource SmallAction}"
+                                                                    Command="{Binding DataContext.RemoveAudioTrackCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                                    CommandParameter="{Binding}" ToolTip="Remove clip">
+                                                                <TextBlock Style="{StaticResource IconGlyph}" Text="&#xE711;" FontSize="9" />
+                                                            </Button>
+                                                        </StackPanel>
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </ListBox.ItemTemplate>
+                                        </ListBox>
+                                        <Border Grid.Row="2" Background="{DynamicResource Brush.Surface}"
+                                                BorderBrush="{DynamicResource Brush.Border}" BorderThickness="0,1,0,0"
+                                                Padding="10,7">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <Button Style="{StaticResource IconButton}" Click="PlayPause_Click"
+                                                        ToolTip="Play mix" Width="32" Height="32" Padding="0"
+                                                        Margin="0,0,8,0" Focusable="False">
+                                                    <TextBlock Style="{StaticResource IconGlyph}" Text="{Binding PlaybackGlyph}"
+                                                               FontSize="14" />
+                                                </Button>
+                                                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                                    <Button Content="Split at playhead" Style="{StaticResource PreviewAction}"
+                                                            Command="{Binding SplitAudioAtPlayheadCommand}" Padding="8,4" />
+                                                    <Button Content="Move up" Style="{StaticResource PreviewAction}"
+                                                            Command="{Binding MoveAudioTrackUpCommand}" Padding="8,4" />
+                                                    <Button Content="Move down" Style="{StaticResource PreviewAction}"
+                                                            Command="{Binding MoveAudioTrackDownCommand}" Padding="8,4" />
+                                                    <Button Content="Clear" Style="{StaticResource PreviewAction}"
+                                                            Command="{Binding ClearAudioTracksCommand}" Padding="8,4" />
+                                                </StackPanel>
+                                                <TextBlock Grid.Column="2" Text="{Binding AudioMergeTotalText}"
+                                                           Style="{StaticResource Caption}" FontSize="9"
+                                                           VerticalAlignment="Center" />
+                                            </Grid>
+                                        </Border>
+                                    </Grid>
+                                </Grid>
+
+                                <!-- PDF workspace -->
+                                <Grid Visibility="{Binding IsPdfTool, Converter={StaticResource BoolToVisibility}}">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+
+                                    <!-- PDF source tabs -->
+                                    <Border Grid.Row="0" Background="{DynamicResource Brush.Surface}"
+                                            BorderBrush="{DynamicResource Brush.Border}" BorderThickness="0,0,0,1"
+                                            Padding="8,5">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <ListBox ItemsSource="{Binding PdfFiles}"
+                                                     SelectedItem="{Binding SelectedPdf, Mode=TwoWay}"
+                                                     ItemContainerStyle="{StaticResource PdfTabItem}"
+                                                     Background="Transparent" BorderThickness="0" Padding="0"
+                                                     ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                                                     ScrollViewer.VerticalScrollBarVisibility="Disabled">
+                                                <ListBox.ItemsPanel>
+                                                    <ItemsPanelTemplate><StackPanel Orientation="Horizontal" /></ItemsPanelTemplate>
+                                                </ListBox.ItemsPanel>
+                                                <ListBox.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <TextBlock Text="{Binding OrderText}" FontFamily="{DynamicResource Font.Mono}"
+                                                                       FontSize="9" Foreground="{DynamicResource Brush.Accent}"
+                                                                       VerticalAlignment="Center" Margin="0,0,5,0" />
+                                                            <StackPanel VerticalAlignment="Center">
+                                                                <TextBlock Text="{Binding FileName}" FontSize="9.5" FontWeight="SemiBold"
+                                                                           MaxWidth="160" TextTrimming="CharacterEllipsis" />
+                                                                <TextBlock Text="{Binding PageText}" Style="{StaticResource Caption}"
+                                                                           FontSize="8.5" />
+                                                            </StackPanel>
+                                                        </StackPanel>
+                                                    </DataTemplate>
+                                                </ListBox.ItemTemplate>
+                                            </ListBox>
+                                            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                                <Button Style="{StaticResource SmallAction}" Command="{Binding PickPdfCommand}"
+                                                        ToolTip="Add PDFs">
+                                                    <TextBlock Style="{StaticResource IconGlyph}" Text="&#xE710;" FontSize="10" />
+                                                </Button>
+                                                <Button Style="{StaticResource SmallAction}" Command="{Binding MovePdfUpCommand}"
+                                                        ToolTip="Move PDF up">
+                                                    <TextBlock Style="{StaticResource IconGlyph}" Text="&#xE70E;" FontSize="10" />
+                                                </Button>
+                                                <Button Style="{StaticResource SmallAction}" Command="{Binding MovePdfDownCommand}"
+                                                        ToolTip="Move PDF down">
+                                                    <TextBlock Style="{StaticResource IconGlyph}" Text="&#xE70D;" FontSize="10" />
+                                                </Button>
+                                                <Button Style="{StaticResource SmallAction}" Command="{Binding RemovePdfCommand}"
+                                                        CommandParameter="{Binding SelectedPdf}" ToolTip="Remove selected PDF">
+                                                    <TextBlock Style="{StaticResource IconGlyph}" Text="&#xE711;" FontSize="10" />
+                                                </Button>
+                                            </StackPanel>
+                                        </Grid>
+                                    </Border>
+
+                                    <!-- Vertical page rail + large portrait page -->
+                                    <Grid Grid.Row="1">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="112" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <Border Grid.Column="0" Background="{DynamicResource Brush.Surface}"
+                                                BorderBrush="{DynamicResource Brush.Border}" BorderThickness="0,0,1,0"
+                                                Padding="8,8,6,8">
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto" />
+                                                    <RowDefinition Height="*" />
+                                                    <RowDefinition Height="Auto" />
+                                                </Grid.RowDefinitions>
+                                                <TextBlock Text="PAGES" Style="{StaticResource TinyLabel}"
+                                                           Margin="0,0,0,7" />
+                                                <ListBox Grid.Row="1" ItemsSource="{Binding PdfThumbnails}"
+                                                         SelectedValuePath="Page"
+                                                         SelectedValue="{Binding PdfPage, Mode=TwoWay}"
+                                                         ItemContainerStyle="{StaticResource PageThumbItem}"
+                                                         Background="Transparent" BorderThickness="0" Padding="0"
+                                                         ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                                         ScrollViewer.VerticalScrollBarVisibility="Auto">
+                                                    <ListBox.ItemsPanel>
+                                                        <ItemsPanelTemplate><StackPanel Orientation="Vertical" /></ItemsPanelTemplate>
+                                                    </ListBox.ItemsPanel>
+                                                    <ListBox.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <StackPanel Width="80" Margin="0,0,0,7">
+                                                                <Border Height="98" Background="#FFFFFFFF" CornerRadius="2"
+                                                                        BorderBrush="#22000000" BorderThickness="1">
+                                                                    <Image Source="{Binding Image}" Stretch="Uniform" Margin="3" />
+                                                                </Border>
+                                                                <TextBlock Text="{Binding PageText}"
+                                                                           FontFamily="{DynamicResource Font.Mono}"
+                                                                           FontSize="9" Foreground="{DynamicResource Brush.TextMuted}"
+                                                                           HorizontalAlignment="Center" Margin="0,3,0,0" />
+                                                            </StackPanel>
+                                                        </DataTemplate>
+                                                    </ListBox.ItemTemplate>
+                                                </ListBox>
+                                                <TextBlock Grid.Row="2" Text="{Binding PdfThumbnailNote}"
+                                                           Style="{StaticResource Caption}" FontSize="8.5"
+                                                           TextWrapping="Wrap" Margin="0,6,0,0"
+                                                           Visibility="{Binding HasPdfThumbnailNote, Converter={StaticResource BoolToVisibility}}" />
+                                            </Grid>
+                                        </Border>
+
+                                        <Grid Grid.Column="1" Background="#080A0F" ClipToBounds="True">
+                                            <controls:AutoPreviewPanel
+                                                AspectSource="{Binding PdfPreview}"
+                                                MinimumPreviewWidth="180"
+                                                MinimumPreviewHeight="220">
+                                                <Grid Background="#080A0F">
+                                                    <Image Source="{Binding PdfPreview}" Stretch="Uniform"
+                                                           RenderOptions.BitmapScalingMode="HighQuality" />
+                                                    <Button Style="{StaticResource NavOverlay}" Command="{Binding PdfPreviousCommand}"
+                                                            HorizontalAlignment="Left" VerticalAlignment="Center" Margin="8,0,0,0"
+                                                            ToolTip="Previous page"
+                                                            Visibility="{Binding ShowPdfPageNav, Converter={StaticResource BoolToVisibility}}">
+                                                        <TextBlock Style="{StaticResource IconGlyph}" Text="&#xE76B;" FontSize="14" />
+                                                    </Button>
+                                                    <Button Style="{StaticResource NavOverlay}" Command="{Binding PdfNextCommand}"
+                                                            HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,8,0"
+                                                            ToolTip="Next page"
+                                                            Visibility="{Binding ShowPdfPageNav, Converter={StaticResource BoolToVisibility}}">
+                                                        <TextBlock Style="{StaticResource IconGlyph}" Text="&#xE76C;" FontSize="14" />
+                                                    </Button>
+                                                    <Border HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,8"
+                                                            Background="#B2080B12" CornerRadius="5" Padding="7,3"
+                                                            Visibility="{Binding ShowPdfPageNav, Converter={StaticResource BoolToVisibility}}">
+                                                        <TextBlock Text="{Binding PdfPageLabel}" Foreground="#E8FFFFFF"
+                                                                   FontFamily="{DynamicResource Font.Mono}" FontSize="9" />
+                                                    </Border>
+                                                </Grid>
+                                            </controls:AutoPreviewPanel>
+                                        </Grid>
+                                    </Grid>
+
+                                    <!-- PDF actions inside the preview -->
+                                    <Border Grid.Row="2" Background="{DynamicResource Brush.Surface}"
+                                            BorderBrush="{DynamicResource Brush.Border}" BorderThickness="0,1,0,0"
+                                            Padding="10,7">
+                                        <StackPanel>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                    <TextBlock Text="Pages" Style="{StaticResource Caption}"
+                                                               VerticalAlignment="Center" Margin="0,0,5,0" />
+                                                    <TextBox Text="{Binding PdfPageText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                             Width="130" Padding="7,4" FontFamily="{DynamicResource Font.Mono}"
+                                                             FontSize="10" ToolTip="Examples: 1-3, 5, 8- or * for all" />
+                                                    <TextBlock Text="{Binding PdfSelectionLabel}" Style="{StaticResource Caption}"
+                                                               FontSize="9" VerticalAlignment="Center" Margin="7,0,0,0" />
+                                                    <TextBlock Text="{Binding PdfSelectionError}" Style="{StaticResource Caption}"
+                                                               FontSize="9" Foreground="{DynamicResource Brush.Warning}"
+                                                               VerticalAlignment="Center" Margin="7,0,0,0"
+                                                               TextTrimming="CharacterEllipsis" MaxWidth="180"
+                                                               Visibility="{Binding HasPdfSelectionError, Converter={StaticResource BoolToVisibility}}" />
+                                                </StackPanel>
+                                                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                                                    <TextBlock Text="One file per page" Style="{StaticResource Caption}"
+                                                               VerticalAlignment="Center" Margin="0,0,5,0" />
+                                                    <ToggleButton Style="{StaticResource ToggleSwitch}"
+                                                                  IsChecked="{Binding PdfSeparatePages, Mode=TwoWay}" />
+                                                </StackPanel>
+                                            </Grid>
+                                            <Grid Margin="0,6,0,0">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                    <Button Content="Merge all PDFs" Style="{StaticResource PreviewAction}"
+                                                            Command="{Binding ExportPdfMergeCommand}" Padding="10,5" />
+                                                    <Button Content="Split pages" Style="{StaticResource PreviewAction}"
+                                                            Command="{Binding ExportPdfSplitCommand}" Padding="10,5" />
+                                                    <Button Content="Save pages as images" Style="{StaticResource PreviewAction}"
+                                                            Command="{Binding ExportPdfImagesCommand}" Padding="10,5" />
+                                                </StackPanel>
+                                                <TextBlock Grid.Column="1" Text="{Binding PdfFilesSummary}"
+                                                           Style="{StaticResource Caption}" FontSize="9"
+                                                           VerticalAlignment="Center" />
+                                            </Grid>
+                                        </StackPanel>
+                                    </Border>
+                                </Grid>
+
+                                <!-- Empty / error message -->
+                                <Border Background="#CC080A0F" CornerRadius="9" Padding="22,18"
+                                        HorizontalAlignment="Center" VerticalAlignment="Center"
+                                        MaxWidth="430"
+                                        Panel.ZIndex="5"
+                                        Visibility="{Binding PreviewMessage, Converter={StaticResource StringNotEmptyToVisibility}}">
+                                    <StackPanel>
+                                        <Border Width="44" Height="44" CornerRadius="12"
+                                                Background="{DynamicResource Brush.SurfaceAlt}" HorizontalAlignment="Center">
+                                            <TextBlock Style="{StaticResource IconGlyph}" Text="&#xE8B9;" FontSize="18"
+                                                       Foreground="{DynamicResource Brush.TextFaint}" />
+                                        </Border>
+                                        <TextBlock Text="{Binding PreviewMessage}" Style="{StaticResource Caption}"
+                                                   HorizontalAlignment="Center" TextAlignment="Center"
+                                                   TextWrapping="Wrap" Margin="0,10,0,0" />
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                </Border>
+
+                <!-- Action bar -->
+                <Border Grid.Row="2" Style="{StaticResource Card}" Padding="14,10">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Button Style="{StaticResource IconButton}" Command="{Binding OpenOutputCommand}"
+                                    ToolTip="Open output folder" Margin="0,0,8,0" VerticalAlignment="Center">
+                                <TextBlock Style="{StaticResource IconGlyph}" Text="&#xE838;" FontSize="13" />
+                            </Button>
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                <TextBlock Text="OUTPUT" Style="{StaticResource TinyLabel}" />
+                                <TextBlock Text="{Binding OutputDisplay}" Style="{StaticResource Caption}"
+                                           FontSize="10.5" Margin="0,2,0,0" TextTrimming="CharacterEllipsis"
+                                           TextWrapping="NoWrap" MaxWidth="300" />
+                            </StackPanel>
+                        </Grid>
+
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                            <StackPanel Width="230" Margin="0,0,12,0" VerticalAlignment="Center">
+                                <Grid>
+                                    <TextBlock Text="{Binding StatusTitle}" FontSize="10.5" FontWeight="SemiBold"
+                                               TextTrimming="CharacterEllipsis" MaxWidth="160" />
+                                    <TextBlock Text="{Binding ProgressText}" Style="{StaticResource Caption}"
+                                               FontSize="9" HorizontalAlignment="Right"
+                                               Visibility="{Binding ProgressVisible, Converter={StaticResource BoolToVisibility}}" />
+                                </Grid>
+                                <TextBlock Text="{Binding StatusDetail}" Style="{StaticResource Caption}"
+                                           FontSize="9" Margin="0,2,0,0" TextTrimming="CharacterEllipsis"
+                                           TextWrapping="NoWrap" MaxWidth="230" />
+                                <TextBlock Text="{Binding Notice}" Style="{StaticResource Caption}"
+                                           FontSize="9" Foreground="{DynamicResource Brush.Warning}" Margin="0,2,0,0"
+                                           TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" MaxWidth="230"
+                                           Visibility="{Binding Notice, Converter={StaticResource StringNotEmptyToVisibility}}" />
+                                <ProgressBar Style="{StaticResource SlimProgress}" Margin="0,4,0,0"
+                                             Minimum="0" Maximum="1" Value="{Binding Progress, Mode=OneWay}"
+                                             Visibility="{Binding ProgressVisible, Converter={StaticResource BoolToVisibility}}" />
+                            </StackPanel>
+
+                            <Button Style="{StaticResource GhostButton}" Content="Cancel" Command="{Binding CancelCommand}"
+                                    Padding="11,7" Margin="0,0,6,0"
+                                    Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibility}}" />
+                            <Button Style="{StaticResource IconButton}" Command="{Binding RevealResultCommand}"
+                                    ToolTip="Show saved file" Margin="0,0,4,0"
+                                    Visibility="{Binding CanRevealResult, Converter={StaticResource BoolToVisibility}}">
+                                <TextBlock Style="{StaticResource IconGlyph}" Text="&#xE8B7;" FontSize="13" />
+                            </Button>
+                            <Button Style="{StaticResource PrimaryButton}" Command="{Binding ExportCommand}"
+                                    Padding="16,8" MinWidth="118">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Style="{StaticResource IconGlyph}" Text="&#xE74E;" FontSize="12"
+                                               Margin="0,0,7,0" />
+                                    <TextBlock Text="{Binding ExportButtonText}" FontSize="11.5" />
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Grid>
+
+        <!-- Hidden audio playback element. It stays in the visual tree so formats
+             that Media Foundation can decode still play while the UI shows a waveform. -->
+        <Grid Width="1" Height="1" HorizontalAlignment="Left" VerticalAlignment="Bottom"
+              Opacity="0" IsHitTestVisible="False">
+            <MediaElement x:Name="AudioPlayer" LoadedBehavior="Manual" UnloadedBehavior="Manual"
+                          ScrubbingEnabled="True"
+                          MediaOpened="AudioPlayer_MediaOpened"
+                          MediaEnded="AudioPlayer_MediaEnded"
+                          MediaFailed="AudioPlayer_MediaFailed" />
+        </Grid>
+    </Grid>
+</UserControl>

@@ -1,0 +1,21 @@
+FFmpeg notice
+=============
+
+Nasaq can bundle FFmpeg so audio and video conversion works without a separate
+installation.
+
+This build of FFmpeg was downloaded from:
+  https://www.gyan.dev/ffmpeg/builds/
+
+FFmpeg is free software. The build used here is the "essentials" build, which
+includes GPL-licensed components (for example libx264 and libx265), so it is
+distributed under the GNU General Public License version 3 (GPLv3). The full
+license text is included next to this notice as FFmpeg-LICENSE.txt.
+
+FFmpeg source code:
+  https://ffmpeg.org/download.html
+  https://www.gyan.dev/ffmpeg/builds/
+
+Nasaq calls the bundled ffmpeg.exe/ffprobe.exe as separate processes. If you do
+not want to redistribute FFmpeg, build the app with build-lite.cmd (or
+build.cmd -NoFfmpeg) and let users install FFmpeg themselves.
