@@ -37,7 +37,7 @@ VersionInfoVersion={#MyAppVersion4}
 VersionInfoCompany={#MyAppPublisher}
 VersionInfoDescription={#MyAppName} Setup
 VersionInfoProductName={#MyAppName}
-VersionInfoProductVersion={#MyAppVersion}
+VersionInfoProductVersion={#MyAppVersion4}
 AppComments={#MyAppTagline}
 
 ; Per-user install by default: no UAC prompt, no admin password.

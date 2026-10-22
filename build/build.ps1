@@ -354,7 +354,13 @@ if (-not (Test-Path -LiteralPath $DistDir)) {
 }
 
 $version = (Get-Item -LiteralPath $publishedExe).VersionInfo.ProductVersion
-if ([string]::IsNullOrWhiteSpace($version)) { $version = "1.0.0" }
+if ([string]::IsNullOrWhiteSpace($version)) {
+    $version = "1.0.0"
+} else {
+    # .NET appends "+<commit>" to ProductVersion when building from a Git
+    # repository. Keep the installer name clean: Nasaq-Setup-1.0.0.exe.
+    $version = $version.Split('+')[0].Trim()
+}
 
 $innoArgs = @(
     "/Qp",
